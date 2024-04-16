@@ -283,6 +283,7 @@ export default {
     /**
      TODO: 
      - show number of offline submitted foods on the button
+     - replace vuetify alert with toast
      */
 
     clearForm() {
@@ -445,6 +446,7 @@ export default {
       this.isSubmittingStoredFoods = false;
 
       await this.clearObjectStore('foods');
+      this.hasStoredFoods = false;
     },
 
 
