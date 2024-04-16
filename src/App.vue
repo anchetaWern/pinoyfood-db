@@ -263,8 +263,7 @@ export default {
 
     /**
      TODO: 
-     - show success alert once done submitting food or offline food
-     - clear all inputs once done submitting
+    
      - solve issue with barcode not submitted when submitting data added while offline
      - momentarily show 'back online' once user goes back online
      - show 'submit offline foods' once user goes back online
@@ -315,10 +314,12 @@ export default {
         ];
 
         if (this.captured_barcode_image_data) {
-          Object.assign(imagesData, {
+          
+          imagesData.push({
             field: 'barcode',
             value: this.captured_barcode_image_data
           });
+
         }
 
         this.saveImagesWithGroup(imagesData, group_key);
@@ -415,7 +416,7 @@ export default {
         };
 
         if (barcode_image) {
-          Object.assign(data, { barcode_image });
+          Object.assign(data, { 'barcode_image': barcode_image.value });
         }
 
         return data;
