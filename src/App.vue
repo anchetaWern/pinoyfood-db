@@ -100,6 +100,12 @@
         <div class="mt-2">
           <v-btn block @click="submitStoredFoods" color="grey-darken-4" v-if="hasStoredFoods">
             {{ isSubmittingStoredFoods ? 'Submitting...' : 'Submit Offline Foods' }}
+
+            <v-badge
+              color="gray"
+              :content="storedFoodCount"
+              inline
+            ></v-badge>
           </v-btn>
         </div>
   
@@ -137,6 +143,7 @@ export default {
       isSubmittingStoredFoods: false, 
 
       hasStoredFoods: false,
+      storedFoodCount: 0,
 
       goes_online: false,
 
@@ -206,7 +213,19 @@ export default {
           if (count > 0) {
             console.log(`The "${objectStoreName}" store contains data.`);
 
+            //
+            const getDataRequest = store.getAll();
+            const data = await getDataRequest;
+
+            const result = Object.groupBy(data, ({ groupKey }) => groupKey);
+
+            console.log('Stored data:', data);
+            console.log('res: ', Object.keys(result));
+            //
+
             this.hasStoredFoods = true;
+            this.storedFoodCount = Object.keys(result).length;
+            console.log('stored count: ', count);
           }
         });
 
@@ -282,11 +301,6 @@ export default {
       }
     },
 
-    /**
-     TODO: 
-     - show number of offline submitted foods on the button
-     */
-
     clearForm() {
       this.captured_title_image_data = null;
       this.$refs.title_image_file_input.reset();
@@ -341,6 +355,8 @@ export default {
         }
 
         this.saveImagesWithGroup(imagesData, group_key);
+
+        this.storedFoodCount = this.storedFoodCount + 1;
 
         createToast('Temporarily saved food locally.', { type: 'warning', position: 'bottom-right' });
 
@@ -448,6 +464,7 @@ export default {
 
       await this.clearObjectStore('foods');
       this.hasStoredFoods = false;
+      this.storedFoodCount = 0;
     },
 
 
