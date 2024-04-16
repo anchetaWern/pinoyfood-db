@@ -270,6 +270,17 @@ export default {
      - show 'submit offline foods' once user goes back online
      */
 
+    clearForm() {
+      this.captured_title_image_data = null;
+      this.$refs.title_image_file_input.reset();
+
+      this.captured_foodlabel_image_data = null;
+      this.$refs.foodlabel_image_file_input.reset();
+
+      this.captured_barcode_image_data = null;
+      this.$refs.barcode_image_file_input.reset();
+    },
+
     async submitFood() {
 
       if (navigator.onLine) {
@@ -285,6 +296,8 @@ export default {
         this.isSubmitting = false;
 
         createToast('Food submitted!', { type: 'success', position: 'bottom-right' });
+
+        this.clearForm();
 
       } else {
 
