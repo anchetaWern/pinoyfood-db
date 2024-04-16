@@ -324,11 +324,15 @@ export default {
           barcode_image: this.captured_barcode_image_data, 
         });
 
+        if (res) {
+          createToast('Food submitted!', { type: 'success', position: 'bottom-right' });
+        } else {
+          createToast('Error occurred while submitting food. Please try again.', { type: 'danger', position: 'bottom-right' });
+        }
         this.isSubmitting = false;
-
-        createToast('Food submitted!', { type: 'success', position: 'bottom-right' });
-
         this.clearForm();
+
+        this.updateCurrentLabel();
 
       } else {
 
@@ -397,7 +401,7 @@ export default {
       } catch (err) {
         console.log('error saving food: ', err);
 
-        return err;
+        return false;
       }
   
     },
