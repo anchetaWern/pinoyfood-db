@@ -5,7 +5,15 @@
         <div class="mb-2" v-if="!online">
           <v-alert 
             title="You are offline"
-            text="Submitted entries will be temporarily stored locally. A separate button for submitting to the server will become visible once you go online." color="error"></v-alert>
+            text="Submitted entries will be temporarily stored locally. A separate button for submitting to the server will become visible once you go online." 
+            color="error"></v-alert>
+        </div>
+
+        <div class="mb-2" v-if="goes_online">
+          <v-alert 
+            title="You are back online"
+            text="You can now submit your offline entries to the server (if any)" 
+            color="success"></v-alert>
         </div>
        
         <WebCamUI :fullscreenState="false"  @photoTaken="photoTaken" />
@@ -144,6 +152,8 @@ export default {
 
       hasStoredFoods: false,
 
+      goes_online: false,
+
     };
   },
 
@@ -221,6 +231,13 @@ export default {
 
     updateOnlineStatus() {
       this.online = navigator.onLine;
+
+      if (navigator.onLine) {
+        this.goes_online = true;
+        setTimeout(() => {
+          this.goes_online = false;
+        }, 5000);
+      }
     },
     
     photoTaken(data) {
@@ -263,9 +280,6 @@ export default {
 
     /**
      TODO: 
-    
-     - solve issue with barcode not submitted when submitting data added while offline
-     - momentarily show 'back online' once user goes back online
      - show 'submit offline foods' once user goes back online
      */
 
