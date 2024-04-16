@@ -1,22 +1,8 @@
 <template>
   <v-container class="fill-height">
     <v-responsive class="align-center fill-height">
-        
-        <div class="mb-2" v-if="!online">
-          <v-alert 
-            title="You are offline"
-            text="Submitted entries will be temporarily stored locally. A separate button for submitting to the server will become visible once you go online." 
-            color="error"></v-alert>
-        </div>
-
-        <div class="mb-2" v-if="goes_online">
-          <v-alert 
-            title="You are back online"
-            text="You can now submit your offline entries to the server (if any)" 
-            color="success"></v-alert>
-        </div>
-       
-        <WebCamUI :fullscreenState="false"  @photoTaken="photoTaken" />
+         
+        <WebCamUI :fullscreenState="false" @photoTaken="photoTaken" />
         <select @change="setCamera" v-model="deviceId">
             <option v-for="camera in cameras" :value="camera.deviceId">{{camera.label}}</option>
         </select>
@@ -128,7 +114,7 @@ import { WebCamUI } from 'vue-camera-lib'
 
 import generateUniqueId from 'generate-unique-id'
 
-import { createToast } from 'mosha-vue-toastify'
+import { createToast, clearToasts } from 'mosha-vue-toastify'
 import 'mosha-vue-toastify/dist/style.css'
 
 export default {
@@ -233,13 +219,29 @@ export default {
       this.online = navigator.onLine;
 
       if (navigator.onLine) {
-        this.goes_online = true;
         await this.checkIfDatabaseHasData();
 
-        setTimeout(() => {
-          this.goes_online = false;
-        }, 5000);
+        createToast(
+          {
+            title: 'You are back online',
+            description: 'You can now submit your offline entries to the server (if any)'
+          }, 
+          { type: 'success', position: 'bottom-right' }
+        );
+      } else {
+        createToast(
+          {
+            title: 'You are offline',
+            description: 'Submitted entries will be temporarily stored locally. A separate button for submitting to the server will become visible once you go online.'
+          }, 
+          { type: 'danger', position: 'bottom-right' }
+        );
       }
+
+      setTimeout(() => {
+        clearToasts();
+      }, 5000);
+
     },
     
     photoTaken(data) {
@@ -283,7 +285,6 @@ export default {
     /**
      TODO: 
      - show number of offline submitted foods on the button
-     - replace vuetify alert with toast
      */
 
     clearForm() {

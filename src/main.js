@@ -9,8 +9,6 @@ import dbPlugin from './dbPlugin.js'
 import VueCameraLib from 'vue-camera-lib'
 import 'vuetify/dist/vuetify.min.css'
 
-import 'vue-toast-notification/dist/theme-bootstrap.css'
-
 // Vuetify
 import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
