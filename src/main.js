@@ -4,10 +4,13 @@ import { StreamBarcodeReader } from "vue-barcode-reader";
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
-import dbPlugin from './dbPlugin.js';
+import dbPlugin from './dbPlugin.js'
 
 import VueCameraLib from 'vue-camera-lib'
-import 'vuetify/dist/vuetify.min.css';
+import 'vuetify/dist/vuetify.min.css'
+
+import 'vue-toast-notification/dist/theme-bootstrap.css'
+
 // Vuetify
 import 'vuetify/styles'
 import { createVuetify } from 'vuetify'

@@ -14,6 +14,7 @@
     "generate-unique-id": "^2.0.3",
     "idb": "^8.0.0",
     "image-upload-vue": "^0.2.5",
+    "mosha-vue-toastify": "^1.0.23",
     "vue": "^3.4.21",
     "vue-barcode-reader": "^1.0.3",
     "vue-camera-lib": "^1.0.4",

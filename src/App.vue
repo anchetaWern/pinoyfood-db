@@ -120,11 +120,11 @@ import { WebCamUI } from 'vue-camera-lib'
 
 import generateUniqueId from 'generate-unique-id'
 
+import { createToast } from 'mosha-vue-toastify'
+import 'mosha-vue-toastify/dist/style.css'
+
 export default {
   inject: ['dbPromise'],
-
-
-  
 
   data() {
     return {
@@ -153,6 +153,7 @@ export default {
 
     await this.checkIfDatabaseHasData();
   },
+
   destroyed() {
     window.removeEventListener('online', this.updateOnlineStatus);
     window.removeEventListener('offline', this.updateOnlineStatus);
@@ -160,6 +161,7 @@ export default {
 
 
   mounted() {
+    
     this.cameras = this.$refs.webcam.cameras;
     if (this.cameras && this.cameras.length === 0) {
        
@@ -259,6 +261,14 @@ export default {
       }
     },
 
+    /**
+     TODO: 
+     - show success alert once done submitting food or offline food
+     - clear all inputs once done submitting
+     - solve issue with barcode not submitted when submitting data added while offline
+     - momentarily show 'back online' once user goes back online
+     - show 'submit offline foods' once user goes back online
+     */
 
     async submitFood() {
 
@@ -273,6 +283,8 @@ export default {
         });
 
         this.isSubmitting = false;
+
+        createToast('Food submitted!', { type: 'success', position: 'bottom-right' });
 
       } else {
 
@@ -297,6 +309,8 @@ export default {
         }
 
         this.saveImagesWithGroup(imagesData, group_key);
+
+        createToast('Temporarily saved food locally.', { type: 'warning', position: 'bottom-right' });
       }      
     },
 
