@@ -229,11 +229,13 @@ export default {
       }
     },
 
-    updateOnlineStatus() {
+    async updateOnlineStatus() {
       this.online = navigator.onLine;
 
       if (navigator.onLine) {
         this.goes_online = true;
+        await this.checkIfDatabaseHasData();
+
         setTimeout(() => {
           this.goes_online = false;
         }, 5000);
@@ -280,7 +282,8 @@ export default {
 
     /**
      TODO: 
-     - show 'submit offline foods' once user goes back online
+     - empty forms when submitting offline
+     - show number of offline submitted foods on the button
      */
 
     clearForm() {
