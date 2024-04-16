@@ -282,7 +282,6 @@ export default {
 
     /**
      TODO: 
-     - empty forms when submitting offline
      - show number of offline submitted foods on the button
      */
 
@@ -342,6 +341,8 @@ export default {
         this.saveImagesWithGroup(imagesData, group_key);
 
         createToast('Temporarily saved food locally.', { type: 'warning', position: 'bottom-right' });
+
+        this.clearForm();
       }      
     },
 
