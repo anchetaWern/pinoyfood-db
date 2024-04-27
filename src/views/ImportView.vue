@@ -93,12 +93,12 @@
             </div>
 
 
-            <v-btn block @click="submitFood" color="grey-darken-4" v-if="captured_title_image_data && captured_foodlabel_image_data">
+            <v-btn block @click="submitFood" color="grey-darken-4" v-if="captured_title_image_data && captured_foodlabel_image_data" :disabled="isSubmitting">
             {{ isSubmitting ? 'Submitting...' : 'Submit Food' }}
             </v-btn>
 
             <div class="mt-2">
-            <v-btn block @click="submitStoredFoods" color="grey-darken-4" v-if="hasStoredFoods">
+            <v-btn block @click="submitStoredFoods" color="grey-darken-4" v-if="hasStoredFoods" :disabled="isSubmittingStoredFoods">
                 {{ isSubmittingStoredFoods ? 'Submitting...' : 'Submit Offline Foods' }}
 
                 <v-badge
