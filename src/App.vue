@@ -327,7 +327,7 @@ export default {
         if (res) {
           createToast('Food submitted!', { type: 'success', position: 'bottom-right' });
         } else {
-          createToast('Error occurred while submitting food. Please try again.', { type: 'danger', position: 'bottom-right' });
+          // createToast('Error occurred while submitting food. Please try again.', { type: 'danger', position: 'bottom-right' });
         }
         this.isSubmitting = false;
         this.clearForm();
@@ -383,7 +383,7 @@ export default {
       
       try {
         const { title_image, nutrition_label_image, barcode_image } = data;
-        const res = await axios.post('http://pinoy-food-api.test/api/food-labels', 
+        const res = await axios.post('http://192.168.100.3:8000/api/food-labels', 
           { // http://pinoy-food-api.test/api/food-labels | https://ewrxlas7zf.sharedwithexpose.com/api/food-labels
             title_image,
             nutrition_label_image,
@@ -400,7 +400,7 @@ export default {
 
       } catch (err) {
         console.log('error saving food: ', err);
-
+        createToast('Error occurred while submitting food: ' + err, { type: 'danger', position: 'bottom-right' });
         return false;
       }
   
