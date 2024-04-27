@@ -8,6 +8,7 @@ import dbPlugin from './dbPlugin.js'
 
 import VueCameraLib from 'vue-camera-lib'
 import 'vuetify/dist/vuetify.min.css'
+import '@mdi/font/css/materialdesignicons.css';
 
 // Vuetify
 import 'vuetify/styles'

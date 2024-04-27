@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@mdi/font": "^7.4.47",
     "@vueuse/core": "^10.9.0",
     "axios": "^1.6.8",
     "generate-unique-id": "^2.0.3",
