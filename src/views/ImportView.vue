@@ -382,11 +382,11 @@ export default {
     async saveFood (data) {
       
       try {
-
+        const ip_address = localStorage.getItem('ip_address');
         const api_key = localStorage.getItem('api_key');
-
+        
         const { title_image, nutrition_label_image, barcode_image } = data;
-        const res = await axios.post('http://192.168.100.3:8000/api/food-labels', 
+        const res = await axios.post(`http://${ip_address}/api/food-labels`, 
           { // http://pinoy-food-api.test/api/food-labels | https://ewrxlas7zf.sharedwithexpose.com/api/food-labels
             title_image,
             nutrition_label_image,
