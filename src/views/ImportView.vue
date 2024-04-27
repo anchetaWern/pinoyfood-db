@@ -381,6 +381,9 @@ export default {
     async saveFood (data) {
       
       try {
+
+        const api_key = localStorage.getItem('api_key');
+
         const { title_image, nutrition_label_image, barcode_image } = data;
         const res = await axios.post('http://192.168.100.3:8000/api/food-labels', 
           { // http://pinoy-food-api.test/api/food-labels | https://ewrxlas7zf.sharedwithexpose.com/api/food-labels
@@ -390,7 +393,7 @@ export default {
           }, 
           {
             headers: {
-              'x-api-key': 'IJaug2qIVeFwiSWSNoZ4ACgZI', 
+              'x-api-key': api_key, 
             }
           }
         );
