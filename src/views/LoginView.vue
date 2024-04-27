@@ -32,19 +32,22 @@ export default {
       const ipAddress = this.ipAddress;
       const apiKey = this.apiKey;
 
-      localStorage.setItem('api_key', apiKey);
-      localStorage.setItem('ip_address', ipAddress);
+      if (ipAddress && apiKey) {
 
-      createToast(
-        {
-          title: 'API key saved!',
-          description: 'You can now start submitting food labels'
-        }, 
-        { type: 'success', position: 'bottom-right' }
-      );
+        localStorage.setItem('api_key', apiKey);
+        localStorage.setItem('ip_address', ipAddress);
 
-      this.ipAddress = '';
-      this.apiKey = '';
+        createToast(
+          {
+            title: 'IP address & API key saved!',
+            description: 'You can now start submitting food labels'
+          }, 
+          { type: 'success', position: 'bottom-right' }
+        );
+
+        this.ipAddress = '';
+        this.apiKey = '';
+      }
     }
   }
 }
