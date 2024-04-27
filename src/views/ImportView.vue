@@ -163,16 +163,17 @@ export default {
 
 
   mounted() {
-    
-    this.cameras = this.$refs.webcam.cameras;
-    if (this.cameras && this.cameras.length === 0) {
-       
-        let reloadCamInterval = setInterval(() => {
-            this.loadCameras()
-            if (this.cameras.length > 0) {
-                clearInterval(reloadCamInterval)
-            }
-        }, 1000);
+    if (this.$refs.webcam && this.$refs.webcam.cameras) {
+        this.cameras = this.$refs.webcam.cameras;
+        if (this.cameras && this.cameras.length === 0) {
+        
+            let reloadCamInterval = setInterval(() => {
+                this.loadCameras()
+                if (this.cameras.length > 0) {
+                    clearInterval(reloadCamInterval)
+                }
+            }, 1000);
+        }
     }
     
   },
