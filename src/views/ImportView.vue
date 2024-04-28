@@ -12,84 +12,111 @@
             </div>
             
             <div class="mb-3">
-            <v-card
-                class="mx-auto"
-                max-width="344"
-            >
-                <img :src="captured_title_image_data" class="img" />
+              <v-card
+                  class="mx-auto"
+                  max-width="344"
+              >
+                  <img :src="captured_title_image_data" class="img" />
 
-                <v-card-title>
-                <span class="text-subtitle-1">Food or product title*</span>
-                </v-card-title>
+                  <v-card-title>
+                  <span class="text-subtitle-1">Food or product title*</span>
+                  </v-card-title>
 
-                <v-file-input clearable label="Image file input" @change="previewImage('captured_title_image_data', 'title_image_file_input', $event)" ref="title_image_file_input"></v-file-input>
-            
-                <v-card-actions v-if="captured_title_image_data">
-                <v-btn
-                    color="orange-lighten-2"
-                    variant="text"
-                    @click="removeImage('title')"
-                >
-                    Remove
-                </v-btn>
+                  <v-file-input clearable label="Image file input" @change="previewImage('captured_title_image_data', 'title_image_file_input', $event)" ref="title_image_file_input"></v-file-input>
+              
+                  <v-card-actions v-if="captured_title_image_data">
+                  <v-btn
+                      color="orange-lighten-2"
+                      variant="text"
+                      @click="removeImage('title')"
+                  >
+                      Remove
+                  </v-btn>
 
-                </v-card-actions>
+                  </v-card-actions>
 
-            </v-card>
+              </v-card>
             </div>
             
             <div class="mb-3">
-            <v-card
-                class="mx-auto"
-                max-width="344"
-            >
-                <img :src="captured_foodlabel_image_data" class="img" />
+              <v-card
+                  class="mx-auto"
+                  max-width="344"
+              >
+                  <img :src="captured_foodlabel_image_data" class="img" />
 
-                <v-card-title>
-                <span class="text-subtitle-1">Food label*</span>
-                </v-card-title>
+                  <v-card-title>
+                  <span class="text-subtitle-1">Food label*</span>
+                  </v-card-title>
 
-                <v-file-input clearable label="Image file input" @change="previewImage('captured_foodlabel_image_data', 'foodlabel_image_file_input', $event)" ref="foodlabel_image_file_input"></v-file-input>
+                  <v-file-input clearable label="Image file input" @change="previewImage('captured_foodlabel_image_data', 'foodlabel_image_file_input', $event)" ref="foodlabel_image_file_input"></v-file-input>
 
-                <v-card-actions v-if="captured_foodlabel_image_data">
-                <v-btn
-                    color="orange-lighten-2"
-                    variant="text"
-                    @click="removeImage('food_label')"
-                >
-                    Remove
-                </v-btn>
+                  <v-card-actions v-if="captured_foodlabel_image_data">
+                  <v-btn
+                      color="orange-lighten-2"
+                      variant="text"
+                      @click="removeImage('food_label')"
+                  >
+                      Remove
+                  </v-btn>
 
-                </v-card-actions>
+                  </v-card-actions>
 
-            </v-card>
+              </v-card>
             </div>
 
             <div class="mb-3">
-            <v-card
-                class="mx-auto"
-                max-width="344"
-            >
-                <img :src="captured_barcode_image_data" class="img" />
+              <v-card
+                  class="mx-auto"
+                  max-width="344"
+              >
+                  <img :src="captured_ingredients_image_data" class="img" />
 
-                <v-card-title>
-                <span class="text-subtitle-1">Barcode (optional)</span>
-                </v-card-title>
+                  <v-card-title>
+                  <span class="text-subtitle-1">Ingredients (optional)</span>
+                  </v-card-title>
 
-                <v-file-input clearable label="Image file input" @change="previewImage('captured_barcode_image_data', 'barcode_image_file_input', $event)" ref="barcode_image_file_input"></v-file-input>
+                  <v-file-input clearable label="Image file input" @change="previewImage('captured_ingredients_image_data', 'ingredients_image_file_input', $event)" ref="ingredients_image_file_input"></v-file-input>
 
-                <v-card-actions v-if="captured_barcode_image_data">
-                <v-btn
-                    color="orange-lighten-2"
-                    variant="text"
-                    @click="removeImage('barcode')"
-                >
-                    Remove
-                </v-btn>
-                
-                </v-card-actions>
+                  <v-card-actions v-if="captured_ingredients_image_data">
+                  <v-btn
+                      color="orange-lighten-2"
+                      variant="text"
+                      @click="removeImage('ingredients')"
+                  >
+                      Remove
+                  </v-btn>
 
-            </v-card>
+                  </v-card-actions>
+
+              </v-card>
+            </div>
+
+            <div class="mb-3">
+              <v-card
+                  class="mx-auto"
+                  max-width="344"
+              >
+                  <img :src="captured_barcode_image_data" class="img" />
+
+                  <v-card-title>
+                  <span class="text-subtitle-1">Barcode (optional)</span>
+                  </v-card-title>
+
+                  <v-file-input clearable label="Image file input" @change="previewImage('captured_barcode_image_data', 'barcode_image_file_input', $event)" ref="barcode_image_file_input"></v-file-input>
+
+                  <v-card-actions v-if="captured_barcode_image_data">
+                  <v-btn
+                      color="orange-lighten-2"
+                      variant="text"
+                      @click="removeImage('barcode')"
+                  >
+                      Remove
+                  </v-btn>
+                  
+                  </v-card-actions>
+
+              </v-card>
             </div>
 
 
@@ -129,6 +156,7 @@ export default {
     return {
       captured_title_image_data: null,
       captured_foodlabel_image_data: null,
+      captured_ingredients_image_data: null,
       captured_barcode_image_data: null,
       
       cameras: [],
@@ -268,6 +296,9 @@ export default {
         this.captured_title_image_data = data.image_data_url;
       } else if (this.captured_foodlabel_image_data === null) {
         this.captured_foodlabel_image_data = data.image_data_url;
+      } else if (this.captured_ingredients_image_data === null) {
+        console.log('waka: ', data.image_data_url);
+        this.captured_ingredients_image_data = data.image_data_url;
       } else {
         this.captured_barcode_image_data = data.image_data_url;
       }
@@ -283,6 +314,9 @@ export default {
       } else if (type === 'food_label') {
         this.captured_foodlabel_image_data = null;
         this.$refs.foodlabel_image_file_input.reset();
+      } else if (type === 'ingredients') {
+        this.captured_ingredients_image_data = null;
+        this.$refs.ingredients_image_file_input.reset();
       } else {
         this.captured_barcode_image_data = null;
         this.$refs.barcode_image_file_input.reset();
@@ -296,6 +330,8 @@ export default {
         this.currentLabel = 'food or title';
       } else if (this.captured_foodlabel_image_data === null) {
         this.currentLabel = 'food label';
+      } else if (this.captured_ingredients_image_data === null) {
+        this.currentLabel = 'ingredients';
       } else {
         this.currentLabel = 'barcode (optional)';
       }
@@ -307,6 +343,9 @@ export default {
 
       this.captured_foodlabel_image_data = null;
       this.$refs.foodlabel_image_file_input.reset();
+
+      this.captured_ingredients_image_data = null;
+      this.$refs.ingredients_image_file_input.reset();
 
       this.captured_barcode_image_data = null;
       this.$refs.barcode_image_file_input.reset();
@@ -321,6 +360,7 @@ export default {
         const res = await this.saveFood({
           title_image: this.captured_title_image_data,
           nutrition_label_image: this.captured_foodlabel_image_data,
+          ingredients_image: this.captured_ingredients_image_data,
           barcode_image: this.captured_barcode_image_data, 
         });
 
@@ -349,13 +389,20 @@ export default {
           }
         ];
 
+        if (this.captured_ingredients_image_data) {
+          
+          imagesData.push({
+            field: 'ingredients',
+            value: this.captured_ingredients_image_data
+          });
+        }
+
         if (this.captured_barcode_image_data) {
           
           imagesData.push({
             field: 'barcode',
             value: this.captured_barcode_image_data
           });
-
         }
 
         this.saveImagesWithGroup(imagesData, group_key);
@@ -385,11 +432,12 @@ export default {
         const ip_address = localStorage.getItem('ip_address');
         const api_key = localStorage.getItem('api_key');
         
-        const { title_image, nutrition_label_image, barcode_image } = data;
+        const { title_image, nutrition_label_image, ingredients_image, barcode_image } = data;
         const res = await axios.post(`http://${ip_address}/api/food-labels`, 
           { // http://pinoy-food-api.test/api/food-labels | https://ewrxlas7zf.sharedwithexpose.com/api/food-labels
             title_image,
             nutrition_label_image,
+            ingredients_image,
             barcode_image,
           }, 
           {
@@ -462,6 +510,7 @@ export default {
 
         const title_image = this.findItemByField(itm, 'field', 'title').value;
         const nutrition_label_image = this.findItemByField(itm, 'field', 'nutrition_label').value;
+        const ingredients_image = this.findItemByField(itm, 'field', 'ingredients').value;
         const barcode_image = this.findItemByField(itm, 'field', 'barcode');
 
         const data = {
@@ -471,6 +520,10 @@ export default {
 
         if (barcode_image) {
           Object.assign(data, { 'barcode_image': barcode_image.value });
+        }
+
+        if (ingredients_image) {
+          Object.assign(data, { 'ingredients_image': ingredients_image.value });
         }
 
         return data;
