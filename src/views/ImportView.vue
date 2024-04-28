@@ -449,7 +449,7 @@ export default {
               barcode_image,
             }, 
             {
-              timeout: 5000,
+              timeout: 30000,
               headers: {
                 'x-api-key': api_key, 
               }
@@ -465,7 +465,7 @@ export default {
             createToast(
               { 
                 title: 'Error occurred while submitting food', 
-                description: "It's now stored locally. Submit it later once you have a more reliable connection." 
+                description: "It's now stored locally. Submit it later once you have a more reliable connection" 
               }, 
               { type: 'danger', position: 'bottom-right' }
             );
@@ -478,7 +478,11 @@ export default {
         if (alert_enabled) {
           createToast('NO API key and IP address provided. Please login first.', { type: 'danger', position: 'bottom-right' });
         }
+
+        return false;
       }
+
+      return false;
     
     },
 
@@ -544,10 +548,9 @@ export default {
       });
 
       const saved_foods = await this.saveFoods(foods_data);
-      console.log('saved foods: ', saved_foods);
 
-      const saved_food_count = saved_foods.filter(itm => itm === true).length;
-
+      const saved_food_count = saved_foods.filter(itm => typeof itm == 'object').length;
+      
       if (saved_food_count > 0) {
         createToast('Submitted foods to the server!', { type: 'success', position: 'bottom-right' });
      
