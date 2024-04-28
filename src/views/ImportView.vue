@@ -367,8 +367,11 @@ export default {
         if (res) {
           createToast('Food submitted!', { type: 'success', position: 'bottom-right' });
         } else {
-          // createToast('Error occurred while submitting food. Please try again.', { type: 'danger', position: 'bottom-right' });
+          
+          this.saveOffline();
+
         }
+
         this.isSubmitting = false;
         this.clearForm();
 
@@ -376,43 +379,48 @@ export default {
 
       } else {
 
-        const group_key = generateUniqueId();
-
-        const imagesData = [
-          {
-            field: 'title',
-            value: this.captured_title_image_data
-          },
-          {
-            field: 'nutrition_label',
-            value: this.captured_foodlabel_image_data
-          }
-        ];
-
-        if (this.captured_ingredients_image_data) {
-          
-          imagesData.push({
-            field: 'ingredients',
-            value: this.captured_ingredients_image_data
-          });
-        }
-
-        if (this.captured_barcode_image_data) {
-          
-          imagesData.push({
-            field: 'barcode',
-            value: this.captured_barcode_image_data
-          });
-        }
-
-        this.saveImagesWithGroup(imagesData, group_key);
-
-        this.storedFoodCount = this.storedFoodCount + 1;
-
-        createToast('Temporarily saved food locally.', { type: 'warning', position: 'bottom-right' });
+        this.saveOffline();
 
         this.clearForm();
+        createToast('Temporarily saved food locally.', { type: 'warning', position: 'bottom-right' });
+        
       }      
+    },
+
+
+    saveOffline() {
+      const group_key = generateUniqueId();
+
+      const imagesData = [
+        {
+          field: 'title',
+          value: this.captured_title_image_data
+        },
+        {
+          field: 'nutrition_label',
+          value: this.captured_foodlabel_image_data
+        }
+      ];
+
+      if (this.captured_ingredients_image_data) {
+        
+        imagesData.push({
+          field: 'ingredients',
+          value: this.captured_ingredients_image_data
+        });
+      }
+
+      if (this.captured_barcode_image_data) {
+        
+        imagesData.push({
+          field: 'barcode',
+          value: this.captured_barcode_image_data
+        });
+      }
+
+      this.saveImagesWithGroup(imagesData, group_key);
+
+      this.storedFoodCount = this.storedFoodCount + 1;
     },
 
 
@@ -427,44 +435,48 @@ export default {
 
 
     async saveFood (data) {
-      
-      try {
-        const ip_address = localStorage.getItem('ip_address');
-        const api_key = localStorage.getItem('api_key');
-        
-        const { title_image, nutrition_label_image, ingredients_image, barcode_image } = data;
-        const res = await axios.post(`http://${ip_address}/api/food-labels`, 
-          { // http://pinoy-food-api.test/api/food-labels | https://ewrxlas7zf.sharedwithexpose.com/api/food-labels
-            title_image,
-            nutrition_label_image,
-            ingredients_image,
-            barcode_image,
-          }, 
-          {
-            headers: {
-              'x-api-key': api_key, 
+      const ip_address = localStorage.getItem('ip_address');
+      const api_key = localStorage.getItem('api_key');
+
+      if (ip_address && api_key) {
+
+        try {
+          const { title_image, nutrition_label_image, ingredients_image, barcode_image } = data;
+          const res = await axios.post(`http://${ip_address}/api/food-labels`, 
+            { // http://pinoy-food-api.test/api/food-labels | https://ewrxlas7zf.sharedwithexpose.com/api/food-labels
+              title_image,
+              nutrition_label_image,
+              ingredients_image,
+              barcode_image,
+            }, 
+            {
+              timeout: 5000,
+              headers: {
+                'x-api-key': api_key, 
+              }
             }
-          }
-        );
+          );
 
-        return res.data;
+          return res.data;
 
-      } catch (err) {
-        console.log('error saving food: ', err);
-        if (!err.response) {
-            createToast(
-                { title: 'Error occurred', description: 'Error occurred while submitting food: ' + ip_address + ' -> ' + err }, 
-                { type: 'danger', position: 'bottom-right', timeout: -1 }
-            );
-        } else {
-            createToast(
-                { title: 'Error occurred', description: 'Error occurred while submitting food: ' + ip_address + ' -> ' + err.response }, 
-                { type: 'danger', position: 'bottom-right', timeout: -1 }
-            );
+        } catch (err) {
+          console.log('error saving food: ', err);
+          createToast(
+            { 
+              title: 'Error occurred while submitting food', 
+              description: "It's now stored locally. Submit it later once you have a more reliable connection." 
+            }, 
+            { type: 'danger', position: 'bottom-right' }
+          );
+          
+          return false;
         }
-        
-        return false;
+
+      } else {
+
+        createToast('NO API key and IP address provided. Please login first.', { type: 'danger', position: 'bottom-right' });
       }
+      
   
     },
 
