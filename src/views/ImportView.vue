@@ -403,7 +403,18 @@ export default {
 
       } catch (err) {
         console.log('error saving food: ', err);
-        createToast('Error occurred while submitting food: ' + err, { type: 'danger', position: 'bottom-right' });
+        if (!err.response) {
+            createToast(
+                { title: 'Error occurred', description: 'Error occurred while submitting food: ' + ip_address + ' -> ' + err }, 
+                { type: 'danger', position: 'bottom-right', timeout: -1 }
+            );
+        } else {
+            createToast(
+                { title: 'Error occurred', description: 'Error occurred while submitting food: ' + ip_address + ' -> ' + err.response }, 
+                { type: 'danger', position: 'bottom-right', timeout: -1 }
+            );
+        }
+        
         return false;
       }
   
