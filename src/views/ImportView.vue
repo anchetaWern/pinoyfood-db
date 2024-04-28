@@ -367,9 +367,8 @@ export default {
         if (res) {
           createToast('Food submitted!', { type: 'success', position: 'bottom-right' });
         } else {
-          
           this.saveOffline();
-
+          await this.checkIfDatabaseHasData();
         }
 
         this.isSubmitting = false;
@@ -426,7 +425,7 @@ export default {
 
     async saveFoods(data) {
       const processedData = await Promise.all(data.map(async item => {
-        const result = await this.saveFood(item);
+        const result = await this.saveFood(item, false);
         return result;
       }));
 
@@ -434,7 +433,7 @@ export default {
     },
 
 
-    async saveFood (data) {
+    async saveFood (data, alert_enabled = true) {
       const ip_address = localStorage.getItem('ip_address');
       const api_key = localStorage.getItem('api_key');
 
@@ -461,23 +460,26 @@ export default {
 
         } catch (err) {
           console.log('error saving food: ', err);
-          createToast(
-            { 
-              title: 'Error occurred while submitting food', 
-              description: "It's now stored locally. Submit it later once you have a more reliable connection." 
-            }, 
-            { type: 'danger', position: 'bottom-right' }
-          );
-          
+
+          if (alert_enabled) {
+            createToast(
+              { 
+                title: 'Error occurred while submitting food', 
+                description: "It's now stored locally. Submit it later once you have a more reliable connection." 
+              }, 
+              { type: 'danger', position: 'bottom-right' }
+            );
+          }
+
           return false;
         }
 
       } else {
-
-        createToast('NO API key and IP address provided. Please login first.', { type: 'danger', position: 'bottom-right' });
+        if (alert_enabled) {
+          createToast('NO API key and IP address provided. Please login first.', { type: 'danger', position: 'bottom-right' });
+        }
       }
-      
-  
+    
     },
 
 
@@ -522,7 +524,7 @@ export default {
 
         const title_image = this.findItemByField(itm, 'field', 'title').value;
         const nutrition_label_image = this.findItemByField(itm, 'field', 'nutrition_label').value;
-        const ingredients_image = this.findItemByField(itm, 'field', 'ingredients').value;
+        const ingredients_image = this.findItemByField(itm, 'field', 'ingredients');
         const barcode_image = this.findItemByField(itm, 'field', 'barcode');
 
         const data = {
@@ -542,12 +544,25 @@ export default {
       });
 
       const saved_foods = await this.saveFoods(foods_data);
-     
-      this.isSubmittingStoredFoods = false;
+      console.log('saved foods: ', saved_foods);
 
-      await this.clearObjectStore('foods');
-      this.hasStoredFoods = false;
-      this.storedFoodCount = 0;
+      const saved_food_count = saved_foods.filter(itm => itm === true).length;
+
+      if (saved_food_count > 0) {
+        createToast('Submitted foods to the server!', { type: 'success', position: 'bottom-right' });
+     
+        this.isSubmittingStoredFoods = false;
+
+        await this.clearObjectStore('foods');
+
+        this.hasStoredFoods = false;
+        this.storedFoodCount = 0;
+
+      } else {
+        this.isSubmittingStoredFoods = false;
+        createToast('Error occurred while submitting foods. Please try again later.', { type: 'danger', position: 'bottom-right' });
+      }
+      
     },
 
 
