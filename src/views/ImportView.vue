@@ -149,6 +149,8 @@ import generateUniqueId from 'generate-unique-id'
 import { createToast, clearToasts } from 'mosha-vue-toastify'
 import 'mosha-vue-toastify/dist/style.css'
 
+const API_BASE_URI = import.meta.env.VITE_API_URI;
+
 export default {
   inject: ['dbPromise'],
 
@@ -434,15 +436,14 @@ export default {
 
 
     async saveFood (data, alert_enabled = true) {
-      const ip_address = localStorage.getItem('ip_address');
       const api_key = localStorage.getItem('api_key');
 
-      if (ip_address && api_key) {
+      if (api_key) {
 
         try {
           const { title_image, nutrition_label_image, ingredients_image, barcode_image } = data;
-          const res = await axios.post(`http://${ip_address}/api/food-labels`, 
-            { // http://pinoy-food-api.test/api/food-labels | https://ewrxlas7zf.sharedwithexpose.com/api/food-labels
+          const res = await axios.post(`${API_BASE_URI}/food-labels`, 
+            { 
               title_image,
               nutrition_label_image,
               ingredients_image,
@@ -476,7 +477,7 @@ export default {
 
       } else {
         if (alert_enabled) {
-          createToast('NO API key and IP address provided. Please login first.', { type: 'danger', position: 'bottom-right' });
+          createToast('NO API key provided. Please login first.', { type: 'danger', position: 'bottom-right' });
         }
 
         return false;

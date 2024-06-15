@@ -3,7 +3,7 @@
     <v-app-bar-title>
       <a href="/" style="color: #333;">
       <v-icon icon="mdi-food" />
-      PinoyFood
+      PinoyFood DB
       </a>
     </v-app-bar-title>
 
