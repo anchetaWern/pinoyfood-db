@@ -131,15 +131,19 @@
             </v-btn>
 
             <div class="mt-2">
-            <v-btn block @click="submitStoredFoods" color="grey-darken-4" v-if="hasStoredFoods" :disabled="isSubmittingStoredFoods">
-                {{ isSubmittingStoredFoods ? 'Submitting...' : 'Submit Offline Foods' }}
+              <v-btn block @click="submitStoredFoods" color="grey-darken-4" v-if="hasStoredFoods" :disabled="isSubmittingStoredFoods">
+                  {{ isSubmittingStoredFoods ? 'Submitting...' : 'Submit Offline Foods' }}
 
-                <v-badge
-                color="gray"
-                :content="storedFoodCount"
-                inline
-                ></v-badge>
-            </v-btn>
+                  <v-badge
+                  color="gray"
+                  :content="storedFoodCount"
+                  inline
+                  ></v-badge>
+              </v-btn>
+            </div>
+
+            <div class="mt-2">
+              <v-btn block size="x-small" variant="text" @click="clearAllLocal" v-if="hasStoredFoods">Clear all local data</v-btn>
             </div>
     
         </v-responsive>
@@ -221,6 +225,18 @@ export default {
 
 
   methods: {
+
+    async clearAllLocal() {
+      await this.clearObjectStore('foods');
+
+      createToast(
+        {
+          title: 'All clear',
+          description: 'Cleared local storage'
+        }, 
+        { type: 'success', position: 'bottom-right' }
+      );
+    },
 
     previewImage(name, file_input_name, event) {
       const file = event.target.files[0];
