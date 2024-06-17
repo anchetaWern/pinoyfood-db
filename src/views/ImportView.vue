@@ -8,16 +8,16 @@
               type="warning"
             ></v-alert>
 
+            <div class="mt-2 mb-2 current-label" v-if="currentLabel">
+              <span class="text-subtitle-1">Upload or take picture of {{currentLabel}}</span>
+            </div>
+
             <WebCamUI :fullscreenState="false" @photoTaken="photoTaken" />
             <select @change="setCamera" v-model="deviceId">
                 <option v-for="camera in cameras" :value="camera.deviceId">{{camera.label}}</option>
             </select>
-
-            <div class="mb-3 current-label" v-if="currentLabel">
-            <span class="text-subtitle-1">Upload or take picture of {{currentLabel}}</span>
-            </div>
             
-            <div class="mb-3">
+            <div class="mt-2 mb-3">
               <v-card
                   class="mx-auto"
                   max-width="344"
