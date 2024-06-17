@@ -476,7 +476,7 @@ export default {
           if (alert_enabled) {
             createToast(
               { 
-                title: 'Error occurred while submitting food', 
+                title: `Error occurred while submitting food: ${err}`, 
                 description: "It's now stored locally. Submit it later once you have a more reliable connection" 
               }, 
               { type: 'danger', position: 'bottom-right' }
