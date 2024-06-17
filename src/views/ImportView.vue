@@ -438,7 +438,7 @@ export default {
 
     async saveFoods(data) {
       const processedData = await Promise.all(data.map(async item => {
-        const result = await this.saveFood(item, false);
+        const result = await this.saveFood(item);
         return result;
       }));
 
