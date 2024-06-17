@@ -1,7 +1,13 @@
 <template>
     <v-container class="fill-height">
-        <v-responsive class="align-center fill-height">
+        <v-responsive class="align-center fill-height pt-3">
             
+            <v-alert
+              v-if="!hasApiKey"
+              text="API key not yet supplied. Please login first."
+              type="warning"
+            ></v-alert>
+
             <WebCamUI :fullscreenState="false" @photoTaken="photoTaken" />
             <select @change="setCamera" v-model="deviceId">
                 <option v-for="camera in cameras" :value="camera.deviceId">{{camera.label}}</option>
@@ -151,6 +157,7 @@ import 'mosha-vue-toastify/dist/style.css'
 
 const API_BASE_URI = import.meta.env.VITE_API_URI;
 
+
 export default {
   inject: ['dbPromise'],
 
@@ -175,6 +182,8 @@ export default {
       storedFoodCount: 0,
 
       goes_online: false,
+
+      hasApiKey: false,
 
     };
   },
@@ -205,6 +214,8 @@ export default {
             }, 1000);
         }
     }
+
+    this.hasApiKey = localStorage.getItem('api_key') ? true : false;
     
   },
 
