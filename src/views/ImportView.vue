@@ -8,9 +8,18 @@
               type="warning"
             ></v-alert>
 
-            <div class="mt-2 mb-2 current-label" v-if="currentLabel">
-              <span class="text-subtitle-1">Upload or take picture of {{currentLabel}}</span>
-            </div>
+            <vue-flip v-model="flipValue">
+              <template v-slot:front class="front">
+                <div class="current-label" v-if="currentLabel">
+                  <span class="text-subtitle-1">Upload or take picture of</span><div class="text-h6">{{currentLabel}}</div>
+                </div>
+              </template>
+              <template v-slot:back class="back">
+                <div class="current-label" v-if="currentLabel">
+                  <span class="text-subtitle-1">Upload or take picture of</span><div class="text-h6">{{currentLabel}}</div>
+                </div>
+              </template>
+            </vue-flip>
 
             <WebCamUI :fullscreenState="false" @photoTaken="photoTaken" />
             <select @change="setCamera" v-model="deviceId">
@@ -135,9 +144,9 @@
                   {{ isSubmittingStoredFoods ? 'Submitting...' : 'Submit Offline Foods' }}
 
                   <v-badge
-                  color="gray"
-                  :content="storedFoodCount"
-                  inline
+                    color="gray"
+                    :content="storedFoodCount"
+                    inline
                   ></v-badge>
               </v-btn>
             </div>
@@ -151,10 +160,13 @@
 </template>
 
 <script>
+import { ref } from 'vue'
 import axios from 'axios'
 import { WebCamUI } from 'vue-camera-lib'
 
 import generateUniqueId from 'generate-unique-id'
+
+import { VueFlip } from 'vue-flip'
 
 import { createToast, clearToasts } from 'mosha-vue-toastify'
 import 'mosha-vue-toastify/dist/style.css'
@@ -164,6 +176,10 @@ const API_BASE_URI = import.meta.env.VITE_API_URI;
 
 export default {
   inject: ['dbPromise'],
+
+  components: {
+    'vue-flip': VueFlip
+  },
 
   data() {
     return {
@@ -188,6 +204,8 @@ export default {
       goes_online: false,
 
       hasApiKey: false,
+
+      flipValue: ref(true),
 
     };
   },
@@ -239,6 +257,7 @@ export default {
     },
 
     previewImage(name, file_input_name, event) {
+      this.flipValue = !this.flipValue;
       const file = event.target.files[0];
       if (file) {
         const reader = new FileReader();
@@ -355,6 +374,7 @@ export default {
     },
 
     updateCurrentLabel() {
+      flipValue.value = !flipValue.value;
       if (this.captured_title_image_data === null) {
         this.currentLabel = 'food or title';
       } else if (this.captured_foodlabel_image_data === null) {
@@ -675,5 +695,19 @@ export default {
 .current-label {
   padding: 10px;
   border: 1px dashed #ccc;
+}
+
+.front {
+  margin-top: 10px;
+  height: 80px !important;
+  background-color: #1CD760;
+  text-align: center;
+}
+
+.back {
+  margin-top: 10px;
+  height: 80px !important;
+  background-color: #1AC9FC;
+  text-align: center;
 }
 </style>

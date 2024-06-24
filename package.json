@@ -18,6 +18,7 @@
     "mosha-vue-toastify": "^1.0.23",
     "vue": "^3.4.21",
     "vue-camera-lib": "^1.0.4",
+    "vue-flip": "^3.0.2",
     "vue-router": "^4.3.0",
     "vue-upload-component": "^3.1.15",
     "vuetify": "^3.5.13"
