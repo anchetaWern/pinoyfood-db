@@ -10,7 +10,7 @@
 
             <div :class="{ shake: shakeValue }">
               <div class="current-label" v-if="currentLabel">
-                <span class="text-subtitle-1">Upload or take picture of {{currentLabel}}</span>
+                <span class="text-subtitle-1">{{currentLabel}}</span>
               </div>
             </div>
 
@@ -180,7 +180,7 @@ export default {
       cameras: [],
       deviceId: '',
 
-      currentLabel: 'food or title',
+      currentLabel: 'Upload or take picture of food or title',
 
       online: navigator.onLine,
 
@@ -367,15 +367,16 @@ export default {
     },
 
     updateCurrentLabel() {
-    
-      if (this.captured_title_image_data === null) {
-        this.currentLabel = 'food or title';
+      if (this.captured_barcode_image_data !== null) {
+        this.currentLabel = 'All done! Please review the images and click on the submit if all is good.';
+      } else if (this.captured_title_image_data === null) {
+        this.currentLabel = 'Upload or take picture of food or title';
       } else if (this.captured_foodlabel_image_data === null) {
-        this.currentLabel = 'food label';
+        this.currentLabel = 'Upload or take picture of food label';
       } else if (this.captured_ingredients_image_data === null) {
-        this.currentLabel = 'ingredients';
+        this.currentLabel = 'Upload or take picture of ingredients';
       } else {
-        this.currentLabel = 'barcode (optional)';
+        this.currentLabel = 'Upload or take picture of barcode (optional)';
       }
     },
 
