@@ -1,5 +1,5 @@
 <template>
-    <v-container class="fill-height">
+    <div>
         <v-responsive class="align-center fill-height pt-3">
             
             <v-alert
@@ -15,6 +15,7 @@
             </div>
 
             <WebCamUI :fullscreenState="false" @photoTaken="photoTaken" />
+            
             <select @change="setCamera" v-model="deviceId">
               <option v-for="camera in cameras" :value="camera.deviceId">{{camera.label}}</option>
             </select>
@@ -150,7 +151,7 @@
             </div>
     
         </v-responsive>
-    </v-container>
+    </div>
 </template>
 
 <script>
