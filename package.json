@@ -12,6 +12,7 @@
     "@mdi/font": "^7.4.47",
     "@vueuse/core": "^10.9.0",
     "axios": "^1.6.8",
+    "compressorjs": "^1.2.1",
     "generate-unique-id": "^2.0.3",
     "idb": "^8.0.0",
     "image-upload-vue": "^0.2.5",

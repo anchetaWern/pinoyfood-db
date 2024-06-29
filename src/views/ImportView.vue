@@ -159,6 +159,7 @@ import axios from 'axios'
 import { WebCamUI } from 'vue-camera-lib'
 
 import generateUniqueId from 'generate-unique-id'
+import Compressor from 'compressorjs'
 
 import { createToast, clearToasts } from 'mosha-vue-toastify'
 import 'mosha-vue-toastify/dist/style.css'
@@ -244,9 +245,11 @@ export default {
       );
     },
 
-    previewImage(name, file_input_name, event) {
+    async previewImage(name, file_input_name, event) {
  
       const file = event.target.files[0];
+      const d = await this.optimizeImage(file);
+      console.log(d);
       if (file) {
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -326,18 +329,47 @@ export default {
       }, 5000);
 
     },
+
+    async optimizeImage(blob) {
+      return new Promise((resolve, reject) => {
+        new Compressor(blob, {
+          quality: 0.6,
+          width: 640,
+
+          success(blob_obj) {
+            const reader = new FileReader();
+            reader.readAsDataURL(blob_obj);
+
+            reader.onload = (event) => {
+              const dataURL = event.target.result;
+              resolve(dataURL);
+            };
+
+            reader.onerror = (error) => {
+              reject(error);
+            };
+          },
+
+          error(error) {
+            reject(error);
+          }
+        });
+      });
+    },
+
     
-    photoTaken(data) {
+    async photoTaken(data) {
+      
       this.shakeValue = true;
+
       if (this.captured_title_image_data === null) {
-        this.captured_title_image_data = data.image_data_url;
+        this.captured_title_image_data = await this.optimizeImage(data.blob);
       } else if (this.captured_foodlabel_image_data === null) {
-        this.captured_foodlabel_image_data = data.image_data_url;
+        this.captured_foodlabel_image_data = await this.optimizeImage(data.blob);
       } else if (this.captured_ingredients_image_data === null) {
-        console.log('waka: ', data.image_data_url);
-        this.captured_ingredients_image_data = data.image_data_url;
+        this.captured_ingredients_image_data = await this.optimizeImage(data.blob);
       } else {
-        this.captured_barcode_image_data = data.image_data_url;
+        this.captured_barcode_image_data = await this.optimizeImage(data.blob);
       }
 
       setTimeout(() => {
@@ -345,6 +377,7 @@ export default {
       }, 1000);
 
       this.updateCurrentLabel();
+
     },
 
     removeImage(type) {
