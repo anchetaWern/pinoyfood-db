@@ -8,12 +8,6 @@
               type="warning"
             ></v-alert>
 
-            <div :class="{ shake: shakeValue }">
-              <div class="current-label" v-if="currentLabel">
-                <span class="text-subtitle-1">{{currentLabel}}</span>
-              </div>
-            </div>
-
             <WebCamUI :fullscreenState="false" @photoTaken="photoTaken" />
             <select @change="setCamera" v-model="deviceId">
               <option v-for="camera in cameras" :value="camera.deviceId">{{camera.label}}</option>
@@ -194,8 +188,6 @@ export default {
       goes_online: false,
 
       hasApiKey: false,
-
-      shakeValue: ref(false),
     };
   },
 
@@ -249,7 +241,7 @@ export default {
  
       const file = event.target.files[0];
       const d = await this.optimizeImage(file);
-      console.log(d);
+      
       if (file) {
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -261,7 +253,6 @@ export default {
         this[name] = null;
         this.$refs[file_input_name].reset();
       }
-
       
     },
 
@@ -360,8 +351,6 @@ export default {
     
     async photoTaken(data) {
       
-      this.shakeValue = true;
-
       if (this.captured_title_image_data === null) {
         this.captured_title_image_data = await this.optimizeImage(data.blob);
       } else if (this.captured_foodlabel_image_data === null) {
@@ -371,10 +360,6 @@ export default {
       } else {
         this.captured_barcode_image_data = await this.optimizeImage(data.blob);
       }
-
-      setTimeout(() => {
-        this.shakeValue = false;
-      }, 1000);
 
       this.updateCurrentLabel();
 
@@ -411,6 +396,14 @@ export default {
       } else {
         this.currentLabel = 'Upload or take picture of barcode (optional)';
       }
+
+      createToast(
+        {
+          title: 'Added image!',
+          description: this.currentLabel
+        }, 
+        { type: 'success', position: 'bottom-right' }
+      );
     },
 
     clearForm() {
@@ -736,34 +729,5 @@ export default {
   height: 80px !important;
   background-color: #1AC9FC;
   text-align: center;
-}
-
-
-.shake {
-  animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-  transform: translate3d(0, 0, 0);
-}
-
-@keyframes shake {
-  10%,
-  90% {
-    transform: translate3d(-1px, 0, 0);
-  }
-
-  20%,
-  80% {
-    transform: translate3d(2px, 0, 0);
-  }
-
-  30%,
-  50%,
-  70% {
-    transform: translate3d(-4px, 0, 0);
-  }
-
-  40%,
-  60% {
-    transform: translate3d(4px, 0, 0);
-  }
 }
 </style>
