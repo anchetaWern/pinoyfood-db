@@ -103,21 +103,23 @@
                   <img :src="captured_barcode_image_data" class="img" />
 
                   <v-card-title>
-                  <span class="text-subtitle-1">Barcode (optional)</span>
+                    <span class="text-subtitle-1">Barcode (optional)</span>
                   </v-card-title>
 
                   <v-file-input clearable label="Image file input" @change="previewImage('captured_barcode_image_data', 'barcode_image_file_input', $event)" ref="barcode_image_file_input"></v-file-input>
 
                   <v-card-actions v-if="captured_barcode_image_data">
-                  <v-btn
-                      color="orange-lighten-2"
-                      variant="text"
-                      @click="removeImage('barcode')"
-                  >
+                    <v-btn
+                        color="orange-lighten-2"
+                        variant="text"
+                        @click="removeImage('barcode')"
+                    >
                       Remove
-                  </v-btn>
+                    </v-btn>
                   
                   </v-card-actions>
+
+                  <div v-if="barcode">Barcode: {{barcode}}</div>
 
               </v-card>
             </div>
@@ -155,6 +157,8 @@ import { WebCamUI } from 'vue-camera-lib'
 import generateUniqueId from 'generate-unique-id'
 import Compressor from 'compressorjs'
 
+import { BrowserMultiFormatReader } from '@zxing/browser'
+
 import { createToast, clearToasts } from 'mosha-vue-toastify'
 import 'mosha-vue-toastify/dist/style.css'
 
@@ -164,9 +168,10 @@ const API_BASE_URI = import.meta.env.VITE_API_URI;
 export default {
   inject: ['dbPromise'],
 
-
   data() {
     return {
+      barcode: '',
+      reader: null,
       captured_title_image_data: null,
       captured_foodlabel_image_data: null,
       captured_ingredients_image_data: null,
@@ -196,6 +201,8 @@ export default {
     window.addEventListener('offline', this.updateOnlineStatus);
 
     await this.checkIfDatabaseHasData();
+    console.log('naria');
+    this.reader = new BrowserMultiFormatReader();
   },
 
   destroyed() {
@@ -238,7 +245,7 @@ export default {
     },
 
     async previewImage(name, file_input_name, event) {
- 
+      console.log('file input name: ', file_input_name);
       const file = event.target.files[0];
       const d = await this.optimizeImage(file);
       
@@ -247,12 +254,22 @@ export default {
         reader.onload = (e) => {
           this[name] = e.target.result;
           this.updateCurrentLabel();
+
+          if (file_input_name === 'barcode_image_file_input') {
+            console.log('noto');
+            this.decodeBarcode(e.target.result);
+          }
+
         };
         reader.readAsDataURL(file);
+
+       
       } else {
         this[name] = null;
         this.$refs[file_input_name].reset();
       }
+
+      
       
     },
 
@@ -348,9 +365,31 @@ export default {
       });
     },
 
+
+    decodeBarcode(dataUrl) {
+      console.log('wasu')
+
+      const img = new Image();
+      img.src = dataUrl;
+
+      img.onload = () => {
+        console.log('sein')
+        this.reader.decodeFromImageUrl(dataUrl)
+          .then(result => {
+            console.log('barcode detected!', result);
+            this.barcode = result.text;
+           // URL.revokeObjectURL(url); 
+          })
+          .catch(err => {
+            console.log("Barcode not detected", err);
+            //URL.revokeObjectURL(url); 
+          }); 
+      }
+    },
+
     
     async photoTaken(data) {
-      
+      console.log('photo take: ', data);
       if (this.captured_title_image_data === null) {
         this.captured_title_image_data = await this.optimizeImage(data.blob);
       } else if (this.captured_foodlabel_image_data === null) {
@@ -359,6 +398,9 @@ export default {
         this.captured_ingredients_image_data = await this.optimizeImage(data.blob);
       } else {
         this.captured_barcode_image_data = await this.optimizeImage(data.blob);
+        console.log('sho: ', data.image_data_url);
+        this.decodeBarcode(data.image_data_url);
+        console.log('shi');
       }
 
       this.updateCurrentLabel();
