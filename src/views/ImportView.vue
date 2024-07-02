@@ -95,7 +95,11 @@
               </v-card>
             </div>
 
-            <StreamBarcodeReader @decode="onDecode"></StreamBarcodeReader>
+            <StreamBarcodeReader no-front-cameras @decode="onDecode"></StreamBarcodeReader>
+
+            <ImageBarcodeReader
+              @decode="onDecode"
+            />
 
             <div v-if="barcode">Barcode: {{barcode}}</div>
 
@@ -377,8 +381,9 @@ export default {
       );
     },
 
-    onDecode(res) {
-      this.barcode = res;
+    onDecode(result) {
+      console.log('res: ', result);
+      this.barcode = result;
     },
 
 

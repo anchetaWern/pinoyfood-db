@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@mdi/font": "^7.4.47",
+    "@teckel/vue-barcode-reader": "^1.1.6",
     "@vueuse/core": "^10.9.0",
     "axios": "^1.6.8",
     "compressorjs": "^1.2.1",
@@ -18,7 +19,6 @@
     "image-upload-vue": "^0.2.5",
     "mosha-vue-toastify": "^1.0.23",
     "vue": "^3.4.21",
-    "vue-barcode-reader": "^1.0.3",
     "vue-camera-lib": "^1.0.4",
     "vue-router": "^4.3.0",
     "vue-upload-component": "^3.1.15",
