@@ -95,32 +95,9 @@
               </v-card>
             </div>
 
-            <div class="mb-3">
-              <v-card
-                  class="mx-auto"
-                  max-width="344"
-              >
-                  <img :src="captured_barcode_image_data" class="img" />
+            <StreamBarcodeReader @decode="onDecode"></StreamBarcodeReader>
 
-                  <v-card-title>
-                  <span class="text-subtitle-1">Barcode (optional)</span>
-                  </v-card-title>
-
-                  <v-file-input clearable label="Image file input" @change="previewImage('captured_barcode_image_data', 'barcode_image_file_input', $event)" ref="barcode_image_file_input"></v-file-input>
-
-                  <v-card-actions v-if="captured_barcode_image_data">
-                  <v-btn
-                      color="orange-lighten-2"
-                      variant="text"
-                      @click="removeImage('barcode')"
-                  >
-                      Remove
-                  </v-btn>
-                  
-                  </v-card-actions>
-
-              </v-card>
-            </div>
+            <div v-if="barcode">Barcode: {{barcode}}</div>
 
 
             <v-btn block @click="submitFood" color="grey-darken-4" v-if="captured_title_image_data && captured_foodlabel_image_data" :disabled="isSubmitting">
@@ -170,7 +147,6 @@ export default {
       captured_title_image_data: null,
       captured_foodlabel_image_data: null,
       captured_ingredients_image_data: null,
-      captured_barcode_image_data: null,
       
       cameras: [],
       deviceId: '',
@@ -188,6 +164,8 @@ export default {
       goes_online: false,
 
       hasApiKey: false,
+
+      barcode: ''
     };
   },
 
@@ -357,8 +335,6 @@ export default {
         this.captured_foodlabel_image_data = await this.optimizeImage(data.blob);
       } else if (this.captured_ingredients_image_data === null) {
         this.captured_ingredients_image_data = await this.optimizeImage(data.blob);
-      } else {
-        this.captured_barcode_image_data = await this.optimizeImage(data.blob);
       }
 
       this.updateCurrentLabel();
@@ -376,16 +352,13 @@ export default {
       } else if (type === 'ingredients') {
         this.captured_ingredients_image_data = null;
         this.$refs.ingredients_image_file_input.reset();
-      } else {
-        this.captured_barcode_image_data = null;
-        this.$refs.barcode_image_file_input.reset();
-      }
+      } 
 
       this.updateCurrentLabel();
     },
 
     updateCurrentLabel() {
-      if (this.captured_barcode_image_data !== null) {
+      if (this.captured_ingredients_image_data !== null) {
         this.currentLabel = 'All done! Please review the images and click on the submit if all is good.';
       } else if (this.captured_title_image_data === null) {
         this.currentLabel = 'Upload or take picture of food or title';
@@ -393,9 +366,7 @@ export default {
         this.currentLabel = 'Upload or take picture of food label';
       } else if (this.captured_ingredients_image_data === null) {
         this.currentLabel = 'Upload or take picture of ingredients';
-      } else {
-        this.currentLabel = 'Upload or take picture of barcode (optional)';
-      }
+      } 
 
       createToast(
         {
@@ -406,6 +377,11 @@ export default {
       );
     },
 
+    onDecode(res) {
+      this.barcode = res;
+    },
+
+
     clearForm() {
       this.captured_title_image_data = null;
       this.$refs.title_image_file_input.reset();
@@ -415,9 +391,6 @@ export default {
 
       this.captured_ingredients_image_data = null;
       this.$refs.ingredients_image_file_input.reset();
-
-      this.captured_barcode_image_data = null;
-      this.$refs.barcode_image_file_input.reset();
     },
 
     async submitFood() {
@@ -430,7 +403,6 @@ export default {
           title_image: this.captured_title_image_data,
           nutrition_label_image: this.captured_foodlabel_image_data,
           ingredients_image: this.captured_ingredients_image_data,
-          barcode_image: this.captured_barcode_image_data, 
         });
 
         if (res) {
@@ -478,11 +450,10 @@ export default {
         });
       }
 
-      if (this.captured_barcode_image_data) {
-        
+      if (this.barcode) {
         imagesData.push({
           field: 'barcode',
-          value: this.captured_barcode_image_data
+          value: this.barcode,
         });
       }
 
@@ -508,13 +479,13 @@ export default {
       if (api_key) {
 
         try {
-          const { title_image, nutrition_label_image, ingredients_image, barcode_image } = data;
+          const { title_image, nutrition_label_image, ingredients_image, barcode } = data;
           const res = await axios.post(`${API_BASE_URI}/food-labels`, 
             { 
               title_image,
               nutrition_label_image,
               ingredients_image,
-              barcode_image,
+              barcode,
             }, 
             {
               timeout: 30000,
@@ -597,16 +568,11 @@ export default {
         const title_image = this.findItemByField(itm, 'field', 'title').value;
         const nutrition_label_image = this.findItemByField(itm, 'field', 'nutrition_label').value;
         const ingredients_image = this.findItemByField(itm, 'field', 'ingredients');
-        const barcode_image = this.findItemByField(itm, 'field', 'barcode');
 
         const data = {
           title_image,
           nutrition_label_image
         };
-
-        if (barcode_image) {
-          Object.assign(data, { 'barcode_image': barcode_image.value });
-        }
 
         if (ingredients_image) {
           Object.assign(data, { 'ingredients_image': ingredients_image.value });

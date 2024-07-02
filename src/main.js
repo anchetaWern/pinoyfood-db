@@ -1,5 +1,7 @@
 import './assets/main.css'
 
+import { StreamBarcodeReader } from "vue-barcode-reader"
+
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
@@ -26,5 +28,7 @@ app.use(router)
 app.use(vuetify);
 app.use(VueCameraLib);
 app.use(dbPlugin);
+
+app.component('StreamBarcodeReader', StreamBarcodeReader);
 
 app.mount('#app')
