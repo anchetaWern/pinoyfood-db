@@ -525,6 +525,13 @@ export default {
         });
       }
 
+      if (this.barcode) {
+        imagesData.push({
+          field: 'barcode_code',
+          value: this.barcode
+        });
+      }
+
       this.saveImagesWithGroup(imagesData, group_key);
 
       this.storedFoodCount = this.storedFoodCount + 1;
@@ -547,13 +554,14 @@ export default {
       if (api_key) {
 
         try {
-          const { title_image, nutrition_label_image, ingredients_image, barcode_image } = data;
+          const { title_image, nutrition_label_image, ingredients_image, barcode_image, barcode } = data;
           const res = await axios.post(`${API_BASE_URI}/food-labels`, 
             { 
               title_image,
               nutrition_label_image,
               ingredients_image,
               barcode_image,
+              barcode
             }, 
             {
               timeout: 30000,
@@ -637,6 +645,7 @@ export default {
         const nutrition_label_image = this.findItemByField(itm, 'field', 'nutrition_label').value;
         const ingredients_image = this.findItemByField(itm, 'field', 'ingredients');
         const barcode_image = this.findItemByField(itm, 'field', 'barcode');
+        const barcode_code = this.findItemByField(itm, 'field', 'barcode_code');
 
         const data = {
           title_image,
@@ -649,6 +658,10 @@ export default {
 
         if (ingredients_image) {
           Object.assign(data, { 'ingredients_image': ingredients_image.value });
+        }
+
+        if (barcode_code) {
+          Object.assign(data, { 'barcode': barcode_code.value });
         }
 
         return data;
