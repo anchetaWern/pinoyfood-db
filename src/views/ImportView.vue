@@ -201,7 +201,6 @@ export default {
     window.addEventListener('offline', this.updateOnlineStatus);
 
     await this.checkIfDatabaseHasData();
-    console.log('naria');
     this.reader = new BrowserMultiFormatReader();
   },
 
@@ -245,7 +244,7 @@ export default {
     },
 
     async previewImage(name, file_input_name, event) {
-      console.log('file input name: ', file_input_name);
+    
       const file = event.target.files[0];
       const d = await this.optimizeImage(file);
       
@@ -256,7 +255,6 @@ export default {
           this.updateCurrentLabel();
 
           if (file_input_name === 'barcode_image_file_input') {
-            console.log('noto');
             this.decodeBarcode(e.target.result);
           }
 
@@ -286,21 +284,15 @@ export default {
           const count = await countRequest;
 
           if (count > 0) {
-            console.log(`The "${objectStoreName}" store contains data.`);
-
             //
             const getDataRequest = store.getAll();
             const data = await getDataRequest;
 
             const result = Object.groupBy(data, ({ groupKey }) => groupKey);
-
-            console.log('Stored data:', data);
-            console.log('res: ', Object.keys(result));
             //
 
             this.hasStoredFoods = true;
             this.storedFoodCount = Object.keys(result).length;
-            console.log('stored count: ', count);
           }
         });
 
@@ -367,29 +359,25 @@ export default {
 
 
     decodeBarcode(dataUrl) {
-      console.log('wasu')
-
+  
       const img = new Image();
       img.src = dataUrl;
 
       img.onload = () => {
-        console.log('sein')
+  
         this.reader.decodeFromImageUrl(dataUrl)
           .then(result => {
-            console.log('barcode detected!', result);
             this.barcode = result.text;
-           // URL.revokeObjectURL(url); 
           })
           .catch(err => {
             console.log("Barcode not detected", err);
-            //URL.revokeObjectURL(url); 
           }); 
       }
     },
 
     
     async photoTaken(data) {
-      console.log('photo take: ', data);
+     
       if (this.captured_title_image_data === null) {
         this.captured_title_image_data = await this.optimizeImage(data.blob);
       } else if (this.captured_foodlabel_image_data === null) {
@@ -398,9 +386,7 @@ export default {
         this.captured_ingredients_image_data = await this.optimizeImage(data.blob);
       } else {
         this.captured_barcode_image_data = await this.optimizeImage(data.blob);
-        console.log('sho: ', data.image_data_url);
         this.decodeBarcode(data.image_data_url);
-        console.log('shi');
       }
 
       this.updateCurrentLabel();
@@ -457,6 +443,8 @@ export default {
 
       this.captured_barcode_image_data = null;
       this.$refs.barcode_image_file_input.reset();
+
+      this.barcode = null;
     },
 
     async submitFood() {
@@ -465,12 +453,18 @@ export default {
 
         this.isSubmitting = true;
 
-        const res = await this.saveFood({
+        const food_data = {
           title_image: this.captured_title_image_data,
           nutrition_label_image: this.captured_foodlabel_image_data,
           ingredients_image: this.captured_ingredients_image_data,
           barcode_image: this.captured_barcode_image_data, 
-        });
+        };
+
+        if (this.barcode) {
+          Object.assign(food_data, { barcode_code: this.barcode });
+        }
+
+        const res = await this.saveFood(food_data);
 
         if (res) {
           createToast('Food submitted!', { type: 'success', position: 'bottom-right' });
@@ -549,19 +543,20 @@ export default {
 
 
     async saveFood (data, alert_enabled = true) {
+     
       const api_key = localStorage.getItem('api_key');
 
       if (api_key) {
 
         try {
-          const { title_image, nutrition_label_image, ingredients_image, barcode_image, barcode } = data;
+          const { title_image, nutrition_label_image, ingredients_image, barcode_image, barcode_code } = data;
           const res = await axios.post(`${API_BASE_URI}/food-labels`, 
             { 
               title_image,
               nutrition_label_image,
               ingredients_image,
               barcode_image,
-              barcode
+              barcode: barcode_code,
             }, 
             {
               timeout: 30000,
@@ -661,7 +656,7 @@ export default {
         }
 
         if (barcode_code) {
-          Object.assign(data, { 'barcode': barcode_code.value });
+          Object.assign(data, { 'barcode_code': barcode_code.value });
         }
 
         return data;
@@ -729,6 +724,7 @@ export default {
 
 
     async saveImagesWithGroup(imagesData, groupKey) {
+      
       try {
         const db = await this.dbPromise;
        
