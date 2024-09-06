@@ -27,132 +27,184 @@
         </v-col>
       </v-row>
 
-      <v-btn block v-if="images.length" color="grey-darken-4" class="mt-4" @click="uploadImagesOneByOne">
-        Upload
+      <div class="mt-3">
+      <v-progress-linear
+      v-if="uploading"
+      :model-value="progressPercentage"
+      color="blue"
+    ></v-progress-linear>
+    </div>
+
+      <div class="text-subtitle-2" v-if="uploading">{{ uploadedImagesCount }}/{{ totalImages }} images uploaded</div>
+
+      <v-btn block :disabled="uploading" v-if="images.length" color="grey-darken-4" class="mt-4" @click="uploadImagesOneByOne">
+        {{ uploading ? "Uploading..." : "Upload Images" }}
       </v-btn>
 
-      <v-progress-linear
-        v-if="uploading"
-        :value="progressPercentage"
-        height="20"
-        color="blue"
-        class="mt-4"
-      ></v-progress-linear>
-
-      <v-alert
-        v-if="uploading"
-        class="mt-2"
-        type="info"
-      >
-        {{ uploadedImagesCount }}/{{ totalImages }} images uploaded
-      </v-alert>
-
-
-     
     </v-responsive>
   </v-container>
   
 </template>
 
 <script>
+const API_BASE_URI = import.meta.env.VITE_API_URI;
+import Compressor from 'compressorjs'
+import axios from 'axios'
+import { createToast, clearToasts } from 'mosha-vue-toastify'
+
 export default {
   data() {
     return {
       images: [],
+
+      selectedFiles: null,
+      uploadedImagesCount: 0,
+      uploading: false,
+      progressPercentage: 0,
+      totalImages: 0,
+
     };
   },
   methods: {
-    previewImages(event) {
-      const files = event.target.files;
+
+    async optimizeImage(blob) {
+      return new Promise((resolve, reject) => {
+        new Compressor(blob, {
+          quality: 0.8,
+          width: 640,
+
+          success(blob_obj) {
+            const reader = new FileReader();
+            reader.readAsDataURL(blob_obj);
+
+            reader.onload = (event) => {
+              const dataURL = event.target.result;
+              resolve(dataURL);
+            };
+
+            reader.onerror = (error) => {
+              reject(error);
+            };
+          },
+
+          error(error) {
+            reject(error);
+          }
+        });
+      });
+    },
+
+
+    previewImages() {
+      const files = this.selectedFiles;
       this.images = [];
 
       Array.from(files).forEach((file) => {
         const reader = new FileReader();
 
         reader.onload = (e) => {
-          this.images.push({ file, url: e.target.result });
+          this.images.push({ file, url: e.target.result, uploading: false, uploaded: false });
         };
 
         reader.readAsDataURL(file);
       });
+
+      this.totalImages = files.length;
     },
+    
     removeImage(index) {
-      this.images.splice(index, 1);
+      if (!this.images[index].uploading) {
+        this.images.splice(index, 1);
+        this.totalImages -= 1;
+      }
+    },
+
+    dataURLtoBlob(dataURL) {
+      const byteString = atob(dataURL.split(',')[1]);
+      const mimeString = dataURL.split(',')[0].split(':')[1].split(';')[0];
+      const ab = new ArrayBuffer(byteString.length);
+      const ia = new Uint8Array(ab);
+
+      for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+      }
+
+      return new Blob([ab], { type: mimeString });
     },
 
     async uploadImagesOneByOne() {
+      this.uploading = true;
+      this.uploadedImagesCount = 0;
+      this.progressPercentage = 0;
+
+      const totalImages = this.images.length;
+
+
       for (const [index, image] of this.images.entries()) {
-        const formData = new FormData();
-        formData.append('image', image.file);
 
+        if (image.uploaded || image.uploading) continue;
+
+        this.images[index].uploading = true;
+        
         try {
-          const response = await fetch('/upload', {
-            method: 'POST',
-            body: formData,
+          const optimizedDataURL = await this.optimizeImage(image.file);
+
+          // Convert base64 dataURL back to Blob for upload
+          const blob = await this.dataURLtoBlob(optimizedDataURL);
+          const formData = new FormData();
+          formData.append('image', blob, image.file.name);
+        
+          const response = await axios.post(`${API_BASE_URI}/bulk-upload`, formData, {
             headers: {
-              Accept: 'application/json',
+              'Accept': 'application/json',
+              'Content-Type': 'multipart/form-data',
             },
-          });
+          });     
 
-          if (!response.ok) {
-            throw new Error(`Image ${index + 1} failed to upload`);
-          }
+          // Mark the image as uploaded after successful upload
+          this.images[index].uploading = false;
+          this.images[index].uploaded = true; 
 
-          const data = await response.json();
-          console.log(`Image ${index + 1} uploaded successfully`, data);
+          // Update progress for each successfully uploaded image
+          this.uploadedImagesCount += 1;
+          this.progressPercentage = Math.round(
+            (this.uploadedImagesCount / totalImages) * 100
+          );
 
-          // Remove the uploaded image from the array
-          this.images.splice(index, 1);
         } catch (error) {
-          console.error(error);
-          //alert(`There was an error uploading image ${index + 1}`);
+          
+          this.images[index].uploading = false;
+          
         }
+    
       }
+
+
+      // Filter out uploaded images if needed (optional)
+      this.images = this.images.filter(image => !image.uploaded);
 
       if (!this.images.length) {
-        //alert('All images uploaded successfully!');
+        createToast(
+          {
+            title: 'Uploaded images!',
+            description: 'Thank you for your contribution! We really appreciate it.'
+          }, 
+          { type: 'success', position: 'bottom-right' }
+        );
+      } else {
+         createToast(
+          {
+            title: 'Upload error',
+            description: 'Please try again later.'
+          }, 
+          { type: 'danger', position: 'bottom-right' }
+        );
       }
+
+      this.uploading = false;
+      this.selectedFiles = null;
     },
 
   },
 };
 </script>
-
-<style scoped>
-.image-uploader {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.image-preview-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.image-preview {
-  position: relative;
-}
-
-.image-preview img {
-  width: 150px;
-  height: 150px;
-  object-fit: cover;
-}
-
-.image-preview button {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  background-color: red;
-  color: white;
-  border: none;
-  padding: 0.5rem;
-  cursor: pointer;
-}
-
-.v-progress-linear {
-  margin-top: 20px;
-}
-</style>
