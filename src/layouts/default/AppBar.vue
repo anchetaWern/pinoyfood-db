@@ -23,11 +23,17 @@
     <template v-slot:default="{ isActive }">
       <v-card title="Help">
         <template v-slot:text>
-          Hello! Thank you for contributing to the food database! First step is to acquire an API key which you can use for logging in. 
+          Hello! Thank you for contributing to the pinoy food database! Your contribution is greatly appreciated. <br>
+          <br> First step is to acquire an API key which you can use for logging in. 
           <br> Please send me an email at ancheta dot wern at gmail dot com
-          <br> You can use this web app to submit foods and their food labels, ingredients and barcode. 
-          <br> Once submitted, it will undergo through a review process before it becomes available on the main website. 
-          <br> Do note that it may take a while since I'm just a one-man team who's also busy with work and life).
+          <br> Once you acquired your API key. Click on <a href="/login">login</a>, paste your API key and log in.
+          <br> After that, you can help out in two ways:
+          <ol class="pl-5">
+            <li>Via the bulk upload - this allows you to pick multiple images from your gallery and submit it by bulk.</li>
+            <li>Via the single upload - this allows you to upload food labels one by one.</li>
+          </ol>
+          <br> Once submitted, it will undergo through a review process before it becomes available on the main website (app.juanutrisyon.info). 
+          
           <br> Here's what each field are for:
           <br>
           <ul class="pl-5">
