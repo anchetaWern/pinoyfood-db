@@ -333,8 +333,8 @@ export default {
     async optimizeImage(blob) {
       return new Promise((resolve, reject) => {
         new Compressor(blob, {
-          quality: 0.6,
-          width: 640,
+          quality: 0.8,
+          width: 1000,
 
           success(blob_obj) {
             const reader = new FileReader();
