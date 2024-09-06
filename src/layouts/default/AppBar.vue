@@ -9,6 +9,8 @@
 
     <div class="mr-2">
       <v-btn icon="mdi-help" @click="helpDialog = true"></v-btn>
+      <a href="/bulk" style="color: #333;">bulk</a>
+      |
       <a href="/login" style="color: #333;">login</a>
     </div>
   </v-app-bar>
