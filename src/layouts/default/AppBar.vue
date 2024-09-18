@@ -2,8 +2,7 @@
   <v-app-bar flat>
     <v-app-bar-title>
       <a href="/" style="color: #333;">
-      <v-icon icon="mdi-food" />
-      PinoyFood DB
+        <img :src="logo" alt="juan nutrisyon logo" style="width:200px;" />
       </a>
     </v-app-bar-title>
 
@@ -61,9 +60,11 @@
 </template>
 
 <script>
+import logo from '@/assets/juan-nutrisyon.png'
 
 export default {
   data: () => ({
+    logo,
     helpDialog: false
   }),
 
