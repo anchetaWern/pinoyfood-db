@@ -3,7 +3,16 @@
   <v-container class="fill-height">
     <v-responsive class="align-center fill-height">
 
-      <v-text-field clearable label="API key" v-model="apiKey"></v-text-field>
+      <v-text-field clearable label="Email" v-model="email"></v-text-field>
+      <v-text-field
+        v-model="password"
+        :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+        :type="showPassword ? 'text' : 'password'"
+        label="Password"
+        name="password"
+        clearable
+        @click:append="showPassword = !showPassword"
+      ></v-text-field>
 
       <v-btn block @click="login" color="grey-darken-4">
       Login
@@ -15,34 +24,52 @@
 </template>
 
 <script>
-import { createToast, clearToasts } from 'mosha-vue-toastify'
+import { createToast } from 'mosha-vue-toastify'
+import { auth } from '@/firebase.js';
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 export default {
   
   data() {
     return {
-      apiKey: '', 
+      email: '',
+      password: '', 
+      showPassword: false,
     };
   },
 
   methods: {
     async login() {
-      const apiKey = this.apiKey;
+      
+      try {
 
-      if (apiKey) {
-
-        localStorage.setItem('api_key', apiKey);
-
+        const userCredential = await signInWithEmailAndPassword(
+            auth,
+            this.email,
+            this.password
+        );
+      
         createToast(
           {
-            title: 'API key saved!',
-            description: 'You can now start submitting food labels'
+            title: 'Login successful',
           }, 
           { type: 'success', position: 'bottom-right' }
         );
 
-        this.apiKey = '';
+        this.$router.push(`/bulk`);
+
+      } catch (error) {
+        
+          createToast(
+              {
+                  title: 'Error logging in',
+                  description: "Please check your details."
+              }, 
+              { type: 'danger', position: 'bottom-right' }
+          );
+
       }
+
     }
   }
 }
