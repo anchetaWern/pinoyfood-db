@@ -8,9 +8,12 @@
 
     <div class="mr-2">
       <v-btn icon="mdi-help" @click="helpDialog = true"></v-btn>
-      <a href="/bulk" style="color: #333;">bulk</a>
-      |
-      <a href="/login" style="color: #333;">login</a>
+
+      <a href="/bulk" style="color: #333;" v-if="loggedInUser">bulk</a>
+      
+      <a href="/login" style="color: #333;" v-if="!loggedInUser">login</a>
+
+      <a href="#" @click="logoutUser" style="color: #333;" v-if="loggedInUser">| logout</a>
     </div>
   </v-app-bar>
 
@@ -61,12 +64,45 @@
 
 <script>
 import logo from '@/assets/juan-nutrisyon.png'
+import { createToast } from 'mosha-vue-toastify'
+import 'mosha-vue-toastify/dist/style.css'
+
+import { signOut } from "firebase/auth"
+import { auth } from '@/firebase.js'
 
 export default {
   data: () => ({
     logo,
     helpDialog: false
   }),
+
+  props: {
+    loggedInUser: {
+      type: Object,
+    }
+  },
+
+  methods: {
+    async logoutUser(event)
+    {
+      event.preventDefault();
+      console.log('logout');
+
+      try {
+        await signOut(auth);
+        console.log("User logged out");
+        createToast(
+          {
+            title: 'Logout successful',
+          }, 
+          { type: 'success', position: 'bottom-right' }
+        );
+      } catch (error) {
+        console.error("Error logging out:", error.message);
+      }
+
+    }
+  }
 
 }
 </script>

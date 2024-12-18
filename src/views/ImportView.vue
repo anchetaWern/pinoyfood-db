@@ -1,13 +1,7 @@
 <template>
     <v-container class="fill-height">
         <v-responsive class="align-center fill-height pt-10">
-            
-            <v-alert
-              v-if="!hasApiKey"
-              text="API key not yet supplied. Please login first."
-              type="warning"
-            ></v-alert>
-
+        
             <WebCamUI :fullscreenState="false" @photoTaken="photoTaken" />
             <select @change="setCamera" v-model="deviceId">
               <option v-for="camera in cameras" :value="camera.deviceId">{{camera.label}}</option>
@@ -192,7 +186,6 @@ export default {
 
       goes_online: false,
 
-      hasApiKey: false,
     };
   },
 
@@ -561,7 +554,7 @@ export default {
             {
               timeout: 30000,
               headers: {
-                'x-api-key': api_key, 
+                'x-api-key': api_key,
               }
             }
           );
