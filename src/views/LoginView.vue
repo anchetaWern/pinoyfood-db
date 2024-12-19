@@ -14,8 +14,8 @@
         @click:append="showPassword = !showPassword"
       ></v-text-field>
 
-      <v-btn block @click="login" color="grey-darken-4">
-      Login
+      <v-btn block @click="login" color="grey-darken-4" :disabled="loggingIn">
+      {{  loggingIn ? "Logging in.." : "Login" }}
       </v-btn>
 
     </v-responsive>
@@ -38,11 +38,14 @@ export default {
       email: '',
       password: '', 
       showPassword: false,
+      loggingIn: false,
     };
   },
 
   methods: {
     async login() {
+
+      this.loggingIn = true;
       
       try {
 
@@ -70,6 +73,9 @@ export default {
           }, 
           { type: 'success', position: 'bottom-right' }
         );
+
+        this.email = '';
+        this.password = '';
 
         this.$router.push(`/bulk`);
 
