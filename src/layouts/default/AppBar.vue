@@ -88,6 +88,8 @@ export default {
       event.preventDefault();
       console.log('logout');
 
+      localStorage.clear();
+
       try {
         await signOut(auth);
         console.log("User logged out");
