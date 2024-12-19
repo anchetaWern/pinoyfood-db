@@ -27,6 +27,9 @@
 import { createToast } from 'mosha-vue-toastify'
 import { auth } from '@/firebase.js';
 import { signInWithEmailAndPassword } from "firebase/auth";
+import axios from 'axios'
+
+const API_BASE_URI = import.meta.env.VITE_API_URI;
 
 export default {
   
@@ -48,7 +51,19 @@ export default {
             this.email,
             this.password
         );
-      
+
+        const user = userCredential.user;
+
+        const token = await user.getIdToken();
+  
+        const res = await axios.post(`${API_BASE_URI}/firebase-auth/sync`, 
+          { 
+            token
+          }, 
+        );
+
+        localStorage.setItem('api_key', res.data.user.api_key);
+
         createToast(
           {
             title: 'Login successful',
