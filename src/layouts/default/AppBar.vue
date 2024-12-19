@@ -103,6 +103,8 @@ export default {
         console.error("Error logging out:", error.message);
       }
 
+      this.$router.push(`/login`);
+
     }
   }
 
