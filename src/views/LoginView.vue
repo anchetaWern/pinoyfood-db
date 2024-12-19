@@ -76,7 +76,8 @@ export default {
 
         this.email = '';
         this.password = '';
-
+        this.loggingIn = false;
+        
         this.$router.push(`/bulk`);
 
       } catch (error) {
@@ -88,6 +89,8 @@ export default {
               }, 
               { type: 'danger', position: 'bottom-right' }
           );
+
+          this.loggingIn = false;
 
       }
 
