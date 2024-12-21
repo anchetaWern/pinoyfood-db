@@ -28,13 +28,13 @@
       <v-card title="Help">
         <template v-slot:text>
           Hello! Thank you for contributing to the pinoy food database! Your contribution is greatly appreciated. <br>
-          <br> First step is to acquire an API key which you can use for logging in. 
-          <br> Please send me an email at ancheta dot wern at gmail dot com
-          <br> Once you acquired your API key. Click on <a href="/login">login</a>, paste your API key and log in.
+          <br> First step is to create an account. 
+          <br> You can create an account by going to the main app website (<a href="https://app.juanutrisyon.info/register" target="_blank">app.juanutrisyon.info/register)</a>.
+          <br> Once registered, go back to the contribute website and click on <a href="/login">login</a>, supply your credentials.
           <br> After that, you can help out in two ways:
           <ol class="pl-5">
             <li>Via the bulk upload - this allows you to pick multiple images from your gallery and submit it by bulk.</li>
-            <li>Via the single upload - this allows you to upload food labels one by one.</li>
+            <li>Via the single upload - this allows you to upload food labels one by one, using either your camera or pick from your gallery.</li>
           </ol>
           <br> Once submitted, it will undergo through a review process before it becomes available on the main website (app.juanutrisyon.info). 
           
