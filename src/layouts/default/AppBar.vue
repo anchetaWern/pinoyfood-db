@@ -2,14 +2,16 @@
   <v-app-bar flat>
     <v-app-bar-title>
       <a href="/" style="color: #333;">
-        <img :src="logo" alt="juan nutrisyon logo" style="width:200px;" />
+        <img :src="logo" alt="juan nutrisyon logo" style="width:150px;" />
       </a>
     </v-app-bar-title>
 
     <div class="mr-2">
-      <v-btn icon="mdi-help" @click="helpDialog = true"></v-btn>
+      <v-btn size="small" icon="mdi-help" @click="helpDialog = true"></v-btn>
 
-      <a href="/bulk" style="color: #333;" v-if="loggedInUser">bulk</a>
+      <a href="/" style="color: #333;" v-if="loggedInUser">single</a>
+
+      <a href="/bulk" style="color: #333;" v-if="loggedInUser">| bulk</a>
       
       <a href="/login" style="color: #333;" v-if="!loggedInUser">login</a>
 
