@@ -153,11 +153,14 @@ export default {
           const blob = await this.dataURLtoBlob(optimizedDataURL);
           const formData = new FormData();
           formData.append('image', blob, image.file.name);
+
+          const api_key = localStorage.getItem('api_key');
         
           const response = await axios.post(`${API_BASE_URI}/bulk-upload`, formData, {
             headers: {
               'Accept': 'application/json',
               'Content-Type': 'multipart/form-data',
+              'x-api-key': api_key
             },
           });     
 
