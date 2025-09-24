@@ -1,24 +1,25 @@
 <template>
 
-  <v-container class="fill-height">
-    <v-responsive class="align-center fill-height">
+  <v-container class="d-flex justify-center align-center" style="min-height: 100vh; width: 100%;">
+    <v-card class="pa-6" min-width="350">
+      <v-form>
+        <v-text-field clearable label="Email" v-model="email"></v-text-field>
+        <v-text-field
+          v-model="password"
+          :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+          :type="showPassword ? 'text' : 'password'"
+          label="Password"
+          name="password"
+          clearable
+          @click:append="showPassword = !showPassword"
+        ></v-text-field>
 
-      <v-text-field clearable label="Email" v-model="email"></v-text-field>
-      <v-text-field
-        v-model="password"
-        :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-        :type="showPassword ? 'text' : 'password'"
-        label="Password"
-        name="password"
-        clearable
-        @click:append="showPassword = !showPassword"
-      ></v-text-field>
-
-      <v-btn block @click="login" color="grey-darken-4" :disabled="loggingIn">
-      {{  loggingIn ? "Logging in.." : "Login" }}
-      </v-btn>
-
-    </v-responsive>
+        <v-btn block @click="login" color="grey-darken-4" :disabled="loggingIn">
+        {{  loggingIn ? "Logging in.." : "Login" }}
+        </v-btn>
+      </v-form>
+    </v-card>
+   
   </v-container>
   
 </template>

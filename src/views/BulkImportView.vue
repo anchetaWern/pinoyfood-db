@@ -1,7 +1,7 @@
 <template>
 
   <v-container class="fill-height">
-    <v-responsive class="align-center fill-height pt-12">
+    <v-responsive class="align-center pt-12">
 
       <v-file-input
         v-model="selectedFiles"
@@ -16,7 +16,7 @@
 
       <v-row v-if="images.length" class="mt-4">
         <v-col v-for="(image, index) in images" :key="index" cols="12" sm="4" md="3">
-          <v-card>
+          <v-card class="px-2">
             <v-img :src="image.url" height="150px"></v-img>
             <v-card-actions>
               <v-btn color="red" @click="removeImage(index)">

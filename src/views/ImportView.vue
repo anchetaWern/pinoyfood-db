@@ -10,7 +10,7 @@
             
             <div class="mt-2 mb-3">
               <v-card
-                  class="mx-auto"
+                  class="mx-auto pl-2 pr-4"
                   max-width="344"
               >
                   <img :src="captured_title_image_data" class="img" />
@@ -37,7 +37,7 @@
             
             <div class="mb-3">
               <v-card
-                  class="mx-auto"
+                  class="mx-auto pl-2 pr-4"
                   max-width="344"
               >
                   <img :src="captured_foodlabel_image_data" class="img" />
@@ -64,7 +64,7 @@
 
             <div class="mb-3">
               <v-card
-                  class="mx-auto"
+                  class="mx-auto pl-2 pr-4"
                   max-width="344"
               >
                   <img :src="captured_ingredients_image_data" class="img" />
@@ -91,7 +91,7 @@
 
             <div class="mb-3">
               <v-card
-                  class="mx-auto"
+                  class="mx-auto pl-2 pr-4"
                   max-width="344"
               >
                   <img :src="captured_barcode_image_data" class="img" />
