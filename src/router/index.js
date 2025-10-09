@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import ImportView from '../views/ImportView.vue'
+import BulkImportView from '../views/BulkImportView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -16,7 +16,7 @@ const router = createRouter({
           // route level code-splitting
           // this generates a separate chunk (Home-[hash].js) for this route
           // which is lazy-loaded when the route is visited.
-          component: ImportView,
+          component: BulkImportView,
         },
 
         {

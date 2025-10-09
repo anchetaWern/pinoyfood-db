@@ -9,10 +9,6 @@
     <div class="mr-2">
       <v-btn size="small" icon="mdi-help" @click="helpDialog = true"></v-btn>
 
-      <a href="/" style="color: #333;" v-if="loggedInUser">single</a>
-
-      <a href="/bulk" style="color: #333;" v-if="loggedInUser">| bulk</a>
-      
       <a href="/login" style="color: #333;" v-if="!loggedInUser">login</a>
 
       <a href="#" @click="logoutUser" style="color: #333;" v-if="loggedInUser">| logout</a>
@@ -27,25 +23,10 @@
     <template v-slot:default="{ isActive }">
       <v-card title="Help">
         <template v-slot:text>
-          Hello! Thank you for contributing to the pinoy food database! Your contribution is greatly appreciated. <br>
-          <br> First step is to create an account. 
-          <br> You can create an account by going to the main app website (<a href="https://app.juanutrisyon.info/register" target="_blank">app.juanutrisyon.info/register)</a>.
-          <br> Once registered, go back to the contribute website and click on <a href="/login">login</a>, supply your credentials.
-          <br> After that, you can help out in two ways:
-          <ol class="pl-5">
-            <li>Via the bulk upload - this allows you to pick multiple images from your gallery and submit it by bulk.</li>
-            <li>Via the single upload - this allows you to upload food labels one by one, using either your camera or pick from your gallery.</li>
-          </ol>
-          <br> Once submitted, it will undergo through a review process before it becomes available on the main website (app.juanutrisyon.info). 
-          
-          <br> Here's what each field are for:
-          <br>
-          <ul class="pl-5">
-            <li>Food or product title - this is the photo of the food itself. Make sure that the title is clear as this will be used when adding the food into the database.</li>
-            <li>Food label - the nutrition facts. Yes, this web app only accepts foods that already have food labels in them.</li>
-            <li>Ingredients - no explanation needed. This may also include allergen information.</li>
-            <li>Barcode - this will be used for barcode search</li>
-          </ul>
+          Hello 👋! Thank you for contributing to the Juan Nutrisyon database! Your contribution is greatly appreciated. <br>
+          To contribute, just select the photos of grocery foods from your phone. <br> Please include photos of the main label (food title). The food label (nutrition facts), and ingredients are optional.
+          Logging in is optional, but if you want to be recognized as a contributor, please consider <a href="https://app.juanutrisyon.info/register">creating an account</a> and then <a href="https://contribute.juanutrisyon.info/login">logging in</a> before uploading photos. 
+          That way we'll know exactly who contributed 🙏.
         </template>
 
         <v-card-actions>

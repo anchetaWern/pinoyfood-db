@@ -157,7 +157,7 @@ import { createToast, clearToasts } from 'mosha-vue-toastify'
 import 'mosha-vue-toastify/dist/style.css'
 
 const API_BASE_URI = import.meta.env.VITE_API_URI;
-
+const JUANUTRISYON_API_KEY = import.meta.env.VITE_APP_JUANUTRISYON_API_KEY;
 
 export default {
   inject: ['dbPromise'],
@@ -216,8 +216,6 @@ export default {
             }, 1000);
         }
     }
-
-    this.hasApiKey = localStorage.getItem('api_key') ? true : false;
     
   },
 
@@ -537,53 +535,43 @@ export default {
 
     async saveFood (data, alert_enabled = true) {
      
-      const api_key = localStorage.getItem('api_key');
-
-      if (api_key) {
-
-        try {
-          const { title_image, nutrition_label_image, ingredients_image, barcode_image, barcode_code } = data;
-          const res = await axios.post(`${API_BASE_URI}/food-labels`, 
-            { 
-              title_image,
-              nutrition_label_image,
-              ingredients_image,
-              barcode_image,
-              barcode: barcode_code,
-            }, 
-            {
-              timeout: 30000,
-              headers: {
-                'x-api-key': api_key,
-              }
+      try {
+        const { title_image, nutrition_label_image, ingredients_image, barcode_image, barcode_code } = data;
+        const res = await axios.post(`${API_BASE_URI}/food-labels`, 
+          { 
+            title_image,
+            nutrition_label_image,
+            ingredients_image,
+            barcode_image,
+            barcode: barcode_code,
+          }, 
+          {
+            timeout: 30000,
+            headers: {
+              'x-api-key': JUANUTRISYON_API_KEY,
             }
-          );
-
-          return res.data;
-
-        } catch (err) {
-          console.log('error saving food: ', err);
-
-          if (alert_enabled) {
-            createToast(
-              { 
-                title: `Error occurred while submitting food: ${err}`, 
-                description: "It's now stored locally. Submit it later once you have a more reliable connection" 
-              }, 
-              { type: 'danger', position: 'bottom-right' }
-            );
           }
+        );
 
-          return false;
-        }
+        return res.data;
 
-      } else {
+      } catch (err) {
+        console.log('error saving food: ', err);
+
         if (alert_enabled) {
-          createToast('NO API key provided. Please login first.', { type: 'danger', position: 'bottom-right' });
+          createToast(
+            { 
+              title: `Error occurred while submitting food: ${err}`, 
+              description: "It's now stored locally. Submit it later once you have a more reliable connection" 
+            }, 
+            { type: 'danger', position: 'bottom-right' }
+          );
         }
 
         return false;
       }
+
+
 
       return false;
     

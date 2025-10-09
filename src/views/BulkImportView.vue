@@ -3,6 +3,10 @@
   <v-container class="fill-height">
     <v-responsive class="align-center pt-12">
 
+      <div class="mb-3">
+        <v-alert text="Click on the field below to select photos of food labels (including the title, and optionally the ingredients)" type="info"></v-alert>
+      </div>
+
       <v-file-input
         v-model="selectedFiles"
         label="Upload Images"
@@ -12,6 +16,21 @@
         @change="previewImages"
         prepend-icon="mdi-camera"
       ></v-file-input>
+
+
+      <div class="mt-3">
+        <v-progress-linear
+          v-if="uploading"
+          :model-value="progressPercentage"
+          color="blue"
+        ></v-progress-linear>
+      </div>
+
+      <div class="text-subtitle-2" v-if="uploading">{{ uploadedImagesCount }}/{{ totalImages }} images uploaded</div>
+
+      <v-btn block :disabled="uploading" v-if="images.length" color="grey-darken-4" class="mt-4" @click="uploadImagesOneByOne">
+        {{ uploading ? "Uploading..." : "Upload Images" }}
+      </v-btn>
 
 
       <v-row v-if="images.length" class="mt-4">
@@ -27,20 +46,6 @@
         </v-col>
       </v-row>
 
-      <div class="mt-3">
-      <v-progress-linear
-      v-if="uploading"
-      :model-value="progressPercentage"
-      color="blue"
-    ></v-progress-linear>
-    </div>
-
-      <div class="text-subtitle-2" v-if="uploading">{{ uploadedImagesCount }}/{{ totalImages }} images uploaded</div>
-
-      <v-btn block :disabled="uploading" v-if="images.length" color="grey-darken-4" class="mt-4" @click="uploadImagesOneByOne">
-        {{ uploading ? "Uploading..." : "Upload Images" }}
-      </v-btn>
-
     </v-responsive>
   </v-container>
   
@@ -48,6 +53,7 @@
 
 <script>
 const API_BASE_URI = import.meta.env.VITE_API_URI;
+const JUANUTRISYON_API_KEY = import.meta.env.VITE_APP_JUANUTRISYON_API_KEY;
 import Compressor from 'compressorjs'
 import axios from 'axios'
 import { createToast, clearToasts } from 'mosha-vue-toastify'
@@ -153,14 +159,12 @@ export default {
           const blob = await this.dataURLtoBlob(optimizedDataURL);
           const formData = new FormData();
           formData.append('image', blob, image.file.name);
-
-          const api_key = localStorage.getItem('api_key');
         
           const response = await axios.post(`${API_BASE_URI}/bulk-upload`, formData, {
             headers: {
               'Accept': 'application/json',
               'Content-Type': 'multipart/form-data',
-              'x-api-key': api_key
+              'x-api-key': JUANUTRISYON_API_KEY
             },
           });     
 
