@@ -77,7 +77,7 @@ export default {
       return new Promise((resolve, reject) => {
         new Compressor(blob, {
           quality: 0.8,
-          width: 2000,
+          width: 1500,
 
           success(blob_obj) {
             const reader = new FileReader();
