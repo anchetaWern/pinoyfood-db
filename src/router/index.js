@@ -33,6 +33,12 @@ const router = createRouter({
           name: 'bulk',
        
           component: () => import('../views/BulkImportView.vue')
+        },
+
+        {
+          path: '/scan',
+          name: 'scan',
+          component: () => import('../views/ScanView.vue')
         }
       ],
     },
