@@ -112,10 +112,10 @@
         <div class="d-flex flex-wrap ga-3">
           <v-btn
             color="grey-darken-4"
-            :disabled="!canSubmit"
+            :disabled="!canSubmit || isSubmitting"
             @click="emit('submit')"
           >
-            Submit label
+            {{ isSubmitting ? 'Saving...' : submitLabel }}
           </v-btn>
         </div>
       </section>
@@ -150,6 +150,14 @@ const props = defineProps({
   confidence: {
     type: Number,
     default: null,
+  },
+  isSubmitting: {
+    type: Boolean,
+    default: false,
+  },
+  submitLabel: {
+    type: String,
+    default: 'Save submission',
   },
 })
 

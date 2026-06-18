@@ -1,17 +1,17 @@
 <template>
   <v-card class="scan-card" rounded="xl" elevation="2">
-    <v-card-title class="text-h6">Nutrition label image</v-card-title>
+    <v-card-title class="text-h6">{{ title }}</v-card-title>
     <v-card-text>
       <p class="text-body-2 text-medium-emphasis mb-4">
-        Upload a clear photo of the nutrition facts label, then click "Read nutrition label" to prefill the form.
+        {{ description }}
       </p>
 
       <v-file-input
         accept="image/*"
         clearable
         density="comfortable"
-        label="Choose nutrition label image"
-        prepend-icon="mdi-camera"
+        :label="inputLabel"
+        :prepend-icon="icon"
         @update:model-value="handleFileChange"
       />
 
@@ -39,7 +39,7 @@
               width="4"
             />
 
-            <div class="preview-loader-text">Reading nutrition label...</div>
+            <div class="preview-loader-text">{{ loadingText }}</div>
           </div>
         </div>
       </v-sheet>
@@ -52,6 +52,27 @@ const props = defineProps({
   file: {
     type: File,
     default: null,
+  },
+  title: {
+    type: String,
+    default: 'Nutrition label image',
+  },
+  description: {
+    type: String,
+    default:
+      'Upload a clear photo of the nutrition facts label, then review the detected values below.',
+  },
+  inputLabel: {
+    type: String,
+    default: 'Choose nutrition label image',
+  },
+  loadingText: {
+    type: String,
+    default: 'Reading nutrition label...',
+  },
+  icon: {
+    type: String,
+    default: 'mdi-camera',
   },
   previewUrl: {
     type: String,

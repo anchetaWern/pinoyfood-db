@@ -1,30 +1,119 @@
 <template>
   <v-container class="scan-page py-8 mt-8">
-    
-
     <v-row class="ga-0">
       <v-col cols="12" lg="5" class="d-flex flex-column ga-6">
         <NutritionLabelImageUploader
+          :file="productLabelImage"
+          :is-loading="productLabelOcrStatus === 'loading'"
+          :preview-url="productLabelPreviewUrl"
+          description="Upload the front-of-pack product image. We'll use OCR to suggest a product name that you can still edit."
+          input-label="Choose product label image"
+          loading-text="Reading product label..."
+          title="Product label image"
+          @select="handleProductLabelSelected"
+        />
+
+        <NutritionLabelImageUploader
           :file="nutritionLabelImage"
           :is-loading="ocrStatus === 'loading'"
-          :preview-url="previewUrl"
-          @select="handleFileSelected"
+          :preview-url="nutritionLabelPreviewUrl"
+          @select="handleNutritionLabelSelected"
+        />
+
+        <NutritionLabelImageUploader
+          :file="ingredientsImage"
+          :preview-url="ingredientsPreviewUrl"
+          description="Upload the ingredients panel image. This is required for the temp food submission."
+          input-label="Choose ingredients image"
+          title="Ingredients image"
+          @select="handleIngredientsImageSelected"
         />
       </v-col>
 
       <v-col cols="12" lg="7" class="d-flex flex-column ga-6">
+        <v-card class="scan-card" rounded="xl" elevation="2">
+          <v-card-title class="text-h6">Product details</v-card-title>
+          <v-card-text class="d-flex flex-column ga-4">
+            <v-alert
+              v-if="productLabelOcrStatus === 'loading'"
+              text="Reading product name from the product label..."
+              type="info"
+              variant="tonal"
+            />
+
+            <v-alert
+              v-else-if="productLabelOcrStatus === 'failed'"
+              text="We couldn't confidently detect the product name. Please enter it manually."
+              type="warning"
+              variant="tonal"
+            />
+
+            <v-alert
+              v-else-if="productLabelOcrStatus === 'success'"
+              text="Product name detected. Please review it before saving."
+              type="success"
+              variant="tonal"
+            />
+
+            <v-text-field
+              v-model="productName"
+              clearable
+              label="Product name"
+              :rules="[requiredTextRule]"
+            />
+          </v-card-text>
+        </v-card>
+
+        <v-card class="scan-card" rounded="xl" elevation="2">
+          <v-card-title class="text-h6">Ingredients text</v-card-title>
+          <v-card-text class="d-flex flex-column ga-4">
+            <v-alert
+              v-if="ingredientsOcrStatus === 'loading'"
+              text="Reading ingredients text from the image..."
+              type="info"
+              variant="tonal"
+            />
+
+            <v-alert
+              v-else-if="ingredientsOcrStatus === 'failed'"
+              text="We couldn't read the ingredients text clearly. Please enter it manually."
+              type="warning"
+              variant="tonal"
+            />
+
+            <v-alert
+              v-else-if="ingredientsOcrStatus === 'success'"
+              text="Ingredients text detected. Please correct it before saving."
+              type="success"
+              variant="tonal"
+            />
+
+            <v-textarea
+              v-model="ingredientsImageText"
+              auto-grow
+              clearable
+              label="Ingredients text"
+              :rules="[requiredTextRule]"
+              rows="4"
+            />
+          </v-card-text>
+        </v-card>
+
         <NutritionFactsCorrectionForm
           :can-submit="canSubmit"
           :confidence="ocrResult?.confidence ?? null"
+          :is-submitting="isSubmitting"
           :ocr-engine="ocrResult?.engine ?? ''"
           :ocr-status="ocrStatus"
           :optional-nutrients="optionalNutrients"
           :required-nutrients="requiredNutrients"
+          submit-label="Save submission"
           @submit="submitScan"
           @update-value="handleValueUpdate"
         />
 
         <OcrRawTextPreview :raw-text="ocrResult?.rawText ?? ''" />
+        <OcrRawTextPreview :raw-text="ingredientsImageOcrText" />
       </v-col>
     </v-row>
   </v-container>
@@ -32,6 +121,7 @@
 
 <script setup>
 import { computed, onBeforeUnmount, ref } from 'vue'
+import Compressor from 'compressorjs'
 import { createToast } from 'mosha-vue-toastify'
 import 'mosha-vue-toastify/dist/style.css'
 
@@ -43,17 +133,29 @@ import {
   REQUIRED_NUTRIENT_FIELDS,
   createDefaultNutrients,
 } from '@/constants/nutritionFields'
+import { runProductLabelOcr } from '@/services/productLabelOcr'
 import {
   hydrateNutrientsFromOcr,
   runNutritionLabelOcr,
 } from '@/services/nutritionLabelOcr'
 import { submitScannedNutritionLabel } from '@/services/submitScannedNutritionLabel'
 
+const productLabelImage = ref(null)
 const nutritionLabelImage = ref(null)
-const previewUrl = ref('')
+const ingredientsImage = ref(null)
+const productLabelPreviewUrl = ref('')
+const nutritionLabelPreviewUrl = ref('')
+const ingredientsPreviewUrl = ref('')
+const productName = ref('')
+const productLabelOcrStatus = ref('idle')
+const productLabelOcrText = ref('')
+const ingredientsOcrStatus = ref('idle')
+const ingredientsImageOcrText = ref('')
+const ingredientsImageText = ref('')
 const ocrStatus = ref('idle')
 const ocrResult = ref(null)
 const correctedNutrients = ref(createDefaultNutrients())
+const isSubmitting = ref(false)
 
 const requiredKeys = new Set(REQUIRED_NUTRIENT_FIELDS.map((item) => item.key))
 const optionalKeys = new Set(OPTIONAL_NUTRIENT_FIELDS.map((item) => item.key))
@@ -132,7 +234,29 @@ const validationWarnings = computed(() => {
   return warnings
 })
 
-const canSubmit = computed(() => Boolean(nutritionLabelImage.value))
+const nutrientsForSubmission = computed(() =>
+  correctedNutrients.value
+    .filter((nutrient) => nutrient.correctedValue !== null && nutrient.correctedValue !== '')
+    .map((nutrient) => ({
+      name: nutrient.label,
+      amount: nutrient.correctedValue,
+      unit: nutrient.unit,
+    })),
+)
+
+const canSubmit = computed(
+  () =>
+    Boolean(
+      productLabelImage.value &&
+        nutritionLabelImage.value &&
+        ingredientsImage.value &&
+        productName.value.trim() &&
+        ingredientsImageText.value.trim() &&
+        nutrientsForSubmission.value.length > 0,
+    ),
+)
+
+const requiredTextRule = (value) => Boolean(String(value || '').trim()) || 'This field is required.'
 
 function numericValue(nutrient) {
   if (!nutrient) {
@@ -149,21 +273,104 @@ function resetScanState() {
   correctedNutrients.value = createDefaultNutrients()
 }
 
-function revokePreviewUrl() {
-  if (previewUrl.value) {
-    URL.revokeObjectURL(previewUrl.value)
+function resetProductLabelState() {
+  productLabelOcrStatus.value = 'idle'
+  productLabelOcrText.value = ''
+}
+
+function resetIngredientsState() {
+  ingredientsOcrStatus.value = 'idle'
+  ingredientsImageOcrText.value = ''
+  ingredientsImageText.value = ''
+}
+
+function revokePreviewUrl(url) {
+  if (url) {
+    URL.revokeObjectURL(url)
   }
 }
 
-async function handleFileSelected(file) {
-  revokePreviewUrl()
-  nutritionLabelImage.value = file
-  previewUrl.value = file ? URL.createObjectURL(file) : ''
+async function optimizeImage(file) {
+  return new Promise((resolve, reject) => {
+    new Compressor(file, {
+      quality: 0.8,
+      width: 1000,
+      success(result) {
+        const compressedFile = new File([result], file.name, {
+          type: result.type || file.type,
+          lastModified: Date.now(),
+        })
+
+        resolve(compressedFile)
+      },
+      error(error) {
+        reject(error)
+      },
+    })
+  })
+}
+
+async function handleProductLabelSelected(file) {
+  revokePreviewUrl(productLabelPreviewUrl.value)
+  productLabelImage.value = null
+  productLabelPreviewUrl.value = ''
+  productName.value = ''
+  resetProductLabelState()
+
+  if (file) {
+    try {
+      productLabelImage.value = await optimizeImage(file)
+      productLabelPreviewUrl.value = URL.createObjectURL(productLabelImage.value)
+    } catch (error) {
+      console.error(error)
+      productLabelImage.value = file
+      productLabelPreviewUrl.value = URL.createObjectURL(file)
+    }
+
+    await readProductLabel()
+  }
+}
+
+async function handleNutritionLabelSelected(file) {
+  revokePreviewUrl(nutritionLabelPreviewUrl.value)
+  nutritionLabelImage.value = null
+  nutritionLabelPreviewUrl.value = ''
   resetScanState()
 
   if (file) {
+    try {
+      nutritionLabelImage.value = await optimizeImage(file)
+      nutritionLabelPreviewUrl.value = URL.createObjectURL(nutritionLabelImage.value)
+    } catch (error) {
+      console.error(error)
+      nutritionLabelImage.value = file
+      nutritionLabelPreviewUrl.value = URL.createObjectURL(file)
+    }
+
     await readNutritionLabel()
   }
+}
+
+async function handleIngredientsImageSelected(file) {
+  revokePreviewUrl(ingredientsPreviewUrl.value)
+  ingredientsImage.value = null
+  ingredientsPreviewUrl.value = ''
+  resetIngredientsState()
+
+  if (!file) {
+    return
+  }
+
+  try {
+    ingredientsImage.value = await optimizeImage(file)
+    ingredientsPreviewUrl.value = URL.createObjectURL(ingredientsImage.value)
+  } catch (error) {
+    console.error(error)
+    ingredientsImage.value = file
+    ingredientsPreviewUrl.value = URL.createObjectURL(file)
+  }
+
+  await readIngredientsImage()
 }
 
 function parseInputValue(unit, value) {
@@ -193,6 +400,34 @@ function handleValueUpdate({ key, value }) {
   })
 }
 
+async function readProductLabel() {
+  if (!productLabelImage.value) {
+    return
+  }
+
+  productLabelOcrStatus.value = 'loading'
+
+  try {
+    const result = await runProductLabelOcr(productLabelImage.value)
+    productLabelOcrText.value = result.rawText || ''
+
+    productName.value = result.suggestedName || ''
+
+    productLabelOcrStatus.value = result.suggestedName ? 'success' : 'failed'
+  } catch (error) {
+    console.error(error)
+    productLabelOcrStatus.value = 'failed'
+    productLabelOcrText.value = ''
+    createToast(
+      {
+        title: 'Product name OCR unavailable',
+        description: 'You can still enter the product name manually.',
+      },
+      { type: 'warning', position: 'bottom-right' },
+    )
+  }
+}
+
 async function readNutritionLabel() {
   if (!nutritionLabelImage.value) {
     return
@@ -219,40 +454,78 @@ async function readNutritionLabel() {
   }
 }
 
-async function submitScan() {
-  const payload = {
-    nutritionLabelImage: nutritionLabelImage.value
-      ? {
-          name: nutritionLabelImage.value.name,
-          size: nutritionLabelImage.value.size,
-          type: nutritionLabelImage.value.type,
-          lastModified: nutritionLabelImage.value.lastModified,
-        }
-      : null,
-    ocr: {
-      engine: ocrResult.value?.engine ?? null,
-      rawText: ocrResult.value?.rawText ?? '',
-      confidence: ocrResult.value?.confidence ?? null,
-      parsedNutrients: ocrResult.value?.parsedNutrients ?? [],
-    },
-    correctedNutrients: correctedNutrients.value,
-    validationWarnings: validationWarnings.value,
-    contributorConfirmedValues: true,
+async function readIngredientsImage() {
+  if (!ingredientsImage.value) {
+    return
   }
 
-  await submitScannedNutritionLabel(payload)
+  ingredientsOcrStatus.value = 'loading'
 
-  createToast(
-    {
-      title: 'Scan payload prepared',
-      description: 'The frontend-only payload was sent to the placeholder submit handler.',
-    },
-    { type: 'success', position: 'bottom-right' },
-  )
+  try {
+    const result = await runProductLabelOcr(ingredientsImage.value)
+    ingredientsImageOcrText.value = result.rawText || ''
+    ingredientsImageText.value = result.rawText || ''
+    ingredientsOcrStatus.value = result.rawText ? 'success' : 'failed'
+  } catch (error) {
+    console.error(error)
+    ingredientsOcrStatus.value = 'failed'
+    ingredientsImageOcrText.value = ''
+    ingredientsImageText.value = ''
+    createToast(
+      {
+        title: 'Ingredients OCR unavailable',
+        description: 'You can still enter the ingredients text manually.',
+      },
+      { type: 'warning', position: 'bottom-right' },
+    )
+  }
+}
+
+async function submitScan() {
+  if (!canSubmit.value || isSubmitting.value) {
+    return
+  }
+
+  isSubmitting.value = true
+
+  try {
+    await submitScannedNutritionLabel({
+      name: productName.value.trim(),
+      productLabelImage: productLabelImage.value,
+      nutritionLabelImage: nutritionLabelImage.value,
+      ingredientsImage: ingredientsImage.value,
+      productLabelOcrText: productLabelOcrText.value,
+      nutritionLabelOcrText: ocrResult.value?.rawText ?? '',
+      ingredientsImageOcrText: ingredientsImageOcrText.value,
+      ingredientsImageText: ingredientsImageText.value.trim(),
+      nutrients: nutrientsForSubmission.value,
+    })
+
+    createToast(
+      {
+        title: 'Submission saved',
+        description: 'The temp food submission was sent to the server successfully.',
+      },
+      { type: 'success', position: 'bottom-right' },
+    )
+  } catch (error) {
+    console.error(error)
+    createToast(
+      {
+        title: 'Submission failed',
+        description: 'We could not save the temp food submission. Please try again.',
+      },
+      { type: 'danger', position: 'bottom-right' },
+    )
+  } finally {
+    isSubmitting.value = false
+  }
 }
 
 onBeforeUnmount(() => {
-  revokePreviewUrl()
+  revokePreviewUrl(productLabelPreviewUrl.value)
+  revokePreviewUrl(nutritionLabelPreviewUrl.value)
+  revokePreviewUrl(ingredientsPreviewUrl.value)
 })
 </script>
 
