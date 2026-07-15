@@ -21,8 +21,8 @@ export default defineConfig({
       },
 
       manifest: {
-        name: 'PinoyFood DB',
-        short_name: 'pinoyfood',
+        name: 'Juan Nutrisyon',
+        short_name: 'juanutrisyon',
         description: 'View nutrition information of Filipino foods',
         theme_color: '#ffffff',
         icons: [
