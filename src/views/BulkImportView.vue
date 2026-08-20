@@ -28,13 +28,15 @@
 
       <div class="text-subtitle-2" v-if="uploading">{{ uploadedImagesCount }}/{{ totalImages }} images uploaded</div>
 
-      <v-btn block :disabled="uploading" v-if="images.length" color="grey-darken-4" class="mt-4" @click="uploadImagesOneByOne">
-        {{ uploading ? "Uploading..." : "Upload Images" }}
-      </v-btn>
+      <div v-if="images.length" ref="uploadActions" class="mt-4 bulk-import-actions">
+        <v-btn block :disabled="uploading" color="grey-darken-4" @click="uploadImagesOneByOne">
+          {{ uploading ? "Uploading..." : "Upload Images" }}
+        </v-btn>
+      </div>
 
 
-      <v-row v-if="images.length" class="mt-4">
-        <v-col v-for="(image, index) in images" :key="index" cols="12" sm="4" md="3">
+      <div v-if="images.length" class="mt-4 bulk-import-grid">
+        <div v-for="(image, index) in images" :key="index">
           <v-card class="px-2">
             <v-img :src="image.url" height="150px"></v-img>
             <v-card-actions>
@@ -43,8 +45,8 @@
               </v-btn>
             </v-card-actions>
           </v-card>
-        </v-col>
-      </v-row>
+        </div>
+      </div>
 
     </v-responsive>
   </v-container>
@@ -101,21 +103,56 @@ export default {
     },
 
 
-    previewImages() {
+    async previewImages() {
       const files = this.selectedFiles;
       this.images = [];
 
-      Array.from(files).forEach((file) => {
-        const reader = new FileReader();
+      if (!files?.length) {
+        this.totalImages = 0;
+        return;
+      }
 
-        reader.onload = (e) => {
-          this.images.push({ file, url: e.target.result, uploading: false, uploaded: false });
-        };
+      const imageReaders = Array.from(files).map((file) => {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
 
-        reader.readAsDataURL(file);
+          reader.onload = (e) => {
+            resolve({ file, url: e.target.result, uploading: false, uploaded: false });
+          };
+
+          reader.onerror = (error) => {
+            reject(error);
+          };
+
+          reader.readAsDataURL(file);
+        });
       });
 
-      this.totalImages = files.length;
+      try {
+        this.images = await Promise.all(imageReaders);
+        this.totalImages = files.length;
+        await this.$nextTick();
+        this.scrollToUploadButton();
+      } catch (error) {
+        this.images = [];
+        this.totalImages = 0;
+      }
+    },
+
+    scrollToUploadButton() {
+      const uploadActions = this.$refs.uploadActions;
+
+      if (!uploadActions) {
+        return;
+      }
+
+      const topOffset = 72;
+      const uploadActionsTop = uploadActions.getBoundingClientRect().top + window.scrollY;
+
+      window.scrollTo({
+        top: Math.max(uploadActionsTop - topOffset, 0),
+        behavior: 'smooth',
+      });
     },
     
     removeImage(index) {
@@ -215,3 +252,17 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.bulk-import-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+.bulk-import-actions {
+  position: sticky;
+  bottom: 16px;
+  z-index: 10;
+}
+</style>
