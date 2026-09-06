@@ -3,6 +3,8 @@
     <default-bar :loggedInUser="loggedInUser" />
 
     <default-view />
+
+    <donation-modal />
   </v-app>
 </template>
 
@@ -10,6 +12,7 @@
 import { ref } from 'vue';
 import DefaultBar from './AppBar.vue'
 import DefaultView from './View.vue'
+import DonationModal from '@/components/contribution/DonationModal.vue'
 
 import { auth } from '@/firebase.js'
 import { onAuthStateChanged } from "firebase/auth"

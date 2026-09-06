@@ -23,8 +23,8 @@ export default defineConfig({
       manifest: {
         name: 'Juan Nutrisyon',
         short_name: 'juanutrisyon',
-        description: 'View nutrition information of Filipino foods',
-        theme_color: '#ffffff',
+        description: 'Share, test, contribute food knowledge, or support Juan Nutrisyon.',
+        theme_color: '#1e784b',
         icons: [
           {
             src: 'pwa-192x192.png',

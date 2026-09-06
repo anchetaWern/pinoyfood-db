@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import HomeView from '../views/HomeView.vue'
 import BulkImportView from '../views/BulkImportView.vue'
 
 const router = createRouter({
@@ -16,7 +17,7 @@ const router = createRouter({
           // route level code-splitting
           // this generates a separate chunk (Home-[hash].js) for this route
           // which is lazy-loaded when the route is visited.
-          component: BulkImportView,
+          component: HomeView,
         },
 
         {
@@ -31,7 +32,7 @@ const router = createRouter({
         {
           path: '/bulk',
           name: 'bulk',
-       
+          alias: '/contribute/product-labels',
           component: () => import('../views/BulkImportView.vue')
         },
 
@@ -45,7 +46,12 @@ const router = createRouter({
 
 
   
-  ]
+  ],
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) return savedPosition
+    if (to.hash) return { el: to.hash, top: 80, behavior: 'smooth' }
+    return { top: 0 }
+  },
 })
 
 export default router

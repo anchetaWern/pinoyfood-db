@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fontsource/atkinson-hyperlegible": "^5.3.0",
     "@mdi/font": "^7.4.47",
     "@vueuse/core": "^10.9.0",
     "@zxing/browser": "^0.1.5",
@@ -19,6 +20,7 @@
     "idb": "^8.0.0",
     "image-upload-vue": "^0.2.5",
     "mosha-vue-toastify": "^1.0.23",
+    "posthog-js": "^1.427.2",
     "tesseract.js": "^7.0.0",
     "vue": "^3.4.21",
     "vue-camera-lib": "^1.0.4",
