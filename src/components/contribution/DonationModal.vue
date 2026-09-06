@@ -116,7 +116,7 @@
           <fieldset class="acknowledgement-fieldset">
             <legend>How should we acknowledge you? <span aria-hidden="true">*</span></legend>
             <v-radio-group v-model="form.acknowledgement" :rules="[requiredRule]">
-              <v-radio label="Use my name or nickname" value="named" />
+              <v-radio label="Use my name or nickname" value="use_name" />
               <v-radio label="Acknowledge me anonymously" value="anonymous" />
               <v-radio label="Please don't acknowledge me publicly" value="private" />
             </v-radio-group>
@@ -195,7 +195,12 @@ watch(isOpen, (open) => {
 const requiredRule = (value) => Boolean(value) || 'This field is required.'
 const positiveAmountRule = (value) => !value || Number(value) > 0 || 'Enter an amount greater than zero.'
 const namedAcknowledgementRule = (value) => {
-  return form.acknowledgement !== 'named' || Boolean(value?.trim()) || 'Enter the name or nickname to acknowledge.'
+  return form.acknowledgement !== 'use_name' || Boolean(value?.trim()) || 'Enter the name or nickname to acknowledge.'
+}
+
+function nullableString(value) {
+  const stringValue = String(value ?? '').trim()
+  return stringValue || null
 }
 
 function handleDialogUpdate(value) {
@@ -229,12 +234,12 @@ async function submitDonation() {
   submitting.value = true
   try {
     await axios.post(`${API_BASE_URI}/donation`, {
-      name: form.name,
-      amount: form.amount ? Number(form.amount) : null,
+      name: nullableString(form.name),
+      amount: nullableString(form.amount),
       payment_method: form.payment_method,
       acknowledgement: form.acknowledgement,
-      message: form.message,
-      contact: form.contact,
+      message: nullableString(form.message),
+      contact: nullableString(form.contact),
     })
 
     captureEvent('donation_notification_submitted', {
